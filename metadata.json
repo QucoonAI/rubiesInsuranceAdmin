@@ -1,0 +1,8 @@
+{
+  "name": "InsureFlow Admin Portal",
+  "description": "A high-performance management portal for mobile insurance apps featuring customer engagement, subscription tracking, payment reconciliation, and an AI-powered claims processing engine.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
