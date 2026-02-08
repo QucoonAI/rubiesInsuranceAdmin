@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   FileSearch, MessageSquare, CheckCircle, XCircle, FileText, 
@@ -36,23 +37,23 @@ const Claims: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Claims Processing</h2>
-          <p className="text-slate-500">Manage the entire lifecycle from notification to settlement.</p>
+          <h2 className="text-2xl font-bold text-[#0D0D12] tracking-tight">Claims Adjudication</h2>
+          <p className="text-slate-500 font-medium">End-to-end lifecycle tracking for global risk management.</p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => exportToCSV(mockClaims, 'insureflow_claims')}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm"
           >
             <Download className="w-4 h-4" />
-            Export CSV
+            Export Audit
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm">
             <Download className="w-4 h-4" />
-            Strategic Claims Report
+            Strategy Report
           </button>
         </div>
       </header>
@@ -60,52 +61,52 @@ const Claims: React.FC = () => {
       {/* Pipeline Visualization */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { label: 'Reported', count: 12, color: 'bg-blue-500' },
-          { label: 'Registered', count: 8, color: 'bg-indigo-500' },
+          { label: 'Reported', count: 12, color: 'bg-[#0D0D12]' },
+          { label: 'Registered', count: 8, color: 'bg-[#0D0D12]/60' },
           { label: 'Outstanding', count: 15, color: 'bg-amber-500' },
           { label: 'Settled', count: 42, color: 'bg-emerald-500' },
           { label: 'Rejected', count: 5, color: 'bg-rose-500' },
         ].map((step, idx) => (
-          <div key={idx} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-            <div className={`w-8 h-1 rounded-full ${step.color} mb-3`} />
-            <div className="text-2xl font-bold text-slate-800">{step.count}</div>
-            <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">{step.label}</div>
+          <div key={idx} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm group hover:shadow-lg transition-all">
+            <div className={`w-8 h-1 rounded-full ${step.color} mb-4`} />
+            <div className="text-3xl font-black text-[#0D0D12] tracking-tighter">{step.count}</div>
+            <div className="text-[9px] text-slate-400 font-black uppercase tracking-[2px]">{step.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-left">
-          <thead className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+          <thead className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             <tr>
               <th className="px-6 py-4">Claim ID</th>
-              <th className="px-6 py-4">Policy Holder</th>
-              <th className="px-6 py-4">Amount</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Date Reported</th>
+              <th className="px-6 py-4">Entity</th>
+              <th className="px-6 py-4">Adjustment</th>
+              <th className="px-6 py-4">State</th>
+              <th className="px-6 py-4">Timestamp</th>
               <th className="px-6 py-4 text-right">Process</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {mockClaims.map((claim) => (
-              <tr key={claim.id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="px-6 py-4 font-mono text-sm text-slate-600">{claim.id}</td>
-                <td className="px-6 py-4 font-semibold text-slate-800">{claim.customerName}</td>
-                <td className="px-6 py-4 font-bold text-slate-800">${claim.amount.toLocaleString()}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    claim.status === 'Settled' ? 'bg-emerald-50 text-emerald-700' :
-                    claim.status === 'Rejected' ? 'bg-rose-50 text-rose-700' :
-                    claim.status === 'Registered' ? 'bg-indigo-50 text-indigo-700' : 'bg-blue-50 text-blue-700'
+              <tr key={claim.id} className="hover:bg-slate-50/50 transition-colors group">
+                <td className="px-6 py-5 font-mono text-xs font-bold text-slate-400 group-hover:text-[#0D0D12]">{claim.id}</td>
+                <td className="px-6 py-5 font-bold text-[#0D0D12]">{claim.customerName}</td>
+                <td className="px-6 py-5 font-black text-[#0D0D12]">${claim.amount.toLocaleString()}</td>
+                <td className="px-6 py-5">
+                  <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                    claim.status === 'Settled' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                    claim.status === 'Rejected' ? 'bg-rose-50 text-rose-700 border-rose-100' :
+                    claim.status === 'Registered' ? 'bg-[#0D0D12]/5 text-[#0D0D12] border-[#0D0D12]/10' : 'bg-slate-100 text-slate-600 border-slate-200'
                   }`}>
                     {claim.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-slate-600">{claim.dateReported}</td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-6 py-5 text-sm font-medium text-slate-500">{claim.dateReported}</td>
+                <td className="px-6 py-5 text-right">
                   <button 
                     onClick={() => handleOpenClaim(claim)}
-                    className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-all"
+                    className="p-2 bg-slate-100 text-[#0D0D12] rounded-xl hover:bg-[#0D0D12] hover:text-white transition-all shadow-sm"
                   >
                     <ArrowRight className="w-5 h-5" />
                   </button>
@@ -118,100 +119,106 @@ const Claims: React.FC = () => {
 
       {/* Claims Processing Modal */}
       {selectedClaim && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
-                  <ShieldAlert className="w-6 h-6" />
+        <div className="fixed inset-0 bg-[#0D0D12]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[40px] w-full max-w-5xl max-h-[90vh] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-slate-100 flex justify-between items-center">
+              <div className="flex items-center gap-6">
+                <div className="w-14 h-14 bg-[#0D0D12] rounded-2xl flex items-center justify-center text-white shadow-xl">
+                  <ShieldAlert className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-800">{selectedClaim.id} — {selectedClaim.customerName}</h3>
-                  <p className="text-sm text-slate-500">Processing claim worth ${selectedClaim.amount.toLocaleString()}</p>
+                  <h3 className="text-2xl font-black text-[#0D0D12] tracking-tighter uppercase italic">{selectedClaim.id} — Portfolio Review</h3>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Adjusting valuation: <span className="text-[#0D0D12]">${selectedClaim.amount.toLocaleString()}.00</span></p>
                 </div>
               </div>
-              <button onClick={() => setSelectedClaim(null)} className="p-2 hover:bg-slate-100 rounded-full">
+              <button onClick={() => setSelectedClaim(null)} className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
                 <MoreHorizontal className="w-6 h-6 rotate-45" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="space-y-6">
+            <div className="flex-1 overflow-y-auto p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div className="space-y-8">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Claim Description</h4>
-                  <p className="text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    {selectedClaim.description}
+                  <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Case Deposition</h4>
+                  <p className="text-slate-600 font-medium leading-relaxed bg-slate-50 p-6 rounded-[28px] border border-slate-100 italic">
+                    "{selectedClaim.description}"
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Supporting Documents</h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Digital Evidence</h4>
+                  <div className="grid grid-cols-1 gap-3">
                     {selectedClaim.docs.length > 0 ? selectedClaim.docs.map((doc, idx) => (
-                      <div key={idx} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl hover:border-blue-400 cursor-pointer transition-all group">
-                        <FileText className="w-5 h-5 text-slate-400 group-hover:text-blue-500" />
-                        <span className="text-sm text-slate-600 truncate">{doc}</span>
+                      <div key={idx} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-[20px] hover:border-[#0D0D12] cursor-pointer transition-all group">
+                        <div className="flex items-center gap-4">
+                          <FileText className="w-5 h-5 text-slate-400 group-hover:text-[#0D0D12]" />
+                          <span className="text-sm font-bold text-slate-600 group-hover:text-[#0D0D12]">{doc}</span>
+                        </div>
+                        <Download className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     )) : (
-                      <p className="text-sm text-slate-400 italic">No documents submitted.</p>
+                      <div className="p-8 border-2 border-dashed border-slate-100 rounded-[20px] text-center">
+                        <p className="text-sm text-slate-300 font-bold uppercase tracking-widest">No evidence uploaded</p>
+                      </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50">
+                <div className="flex gap-4">
+                  <button className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm">
                     <MessageSquare className="w-4 h-4" />
-                    Message Client
+                    Secure Message
                   </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50">
+                  <button className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm">
                     <FileSearch className="w-4 h-4" />
-                    Internal Logs
+                    Internal Audit
                   </button>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <BrainCircuit className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-bold text-slate-800">AI Claim Assessment</h4>
+              <div className="bg-[#0D0D12] rounded-[32px] p-8 border border-slate-800 flex flex-col shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+                <div className="flex items-center justify-between mb-8 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                      <BrainCircuit className="w-5 h-5 text-white" />
+                    </div>
+                    <h4 className="font-bold text-white tracking-tight">AI Neural Assessment</h4>
                   </div>
                   <button 
                     onClick={() => runAiAnalysis(selectedClaim)}
                     disabled={analyzing}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                    className="text-[10px] font-black text-white/50 uppercase tracking-[2px] hover:text-white disabled:opacity-30 transition-colors"
                   >
-                    {analyzing ? 'Processing...' : 'Run Analysis'}
+                    {analyzing ? 'Processing...' : 'Recalculate'}
                   </button>
                 </div>
 
-                <div className="flex-1">
+                <div className="flex-1 relative z-10">
                   {analyzing ? (
                     <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                      <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                      <p className="text-slate-500 text-sm">Validating documents and policy terms...</p>
+                      <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mb-6"></div>
+                      <p className="text-white/60 text-sm font-bold uppercase tracking-widest">Analyzing fraud patterns...</p>
                     </div>
                   ) : aiAnalysis ? (
-                    <div className="prose prose-sm prose-slate">
-                      <p className="whitespace-pre-wrap text-slate-600">
+                    <div className="prose prose-invert prose-sm max-w-none">
+                      <p className="whitespace-pre-wrap text-white/80 leading-relaxed font-medium">
                         {aiAnalysis}
                       </p>
                     </div>
                   ) : (
-                    <div className="h-full flex items-center justify-center text-center p-8">
-                      <p className="text-slate-400 text-sm italic">Click 'Run Analysis' to let Gemini evaluate the risk and validity of this claim.</p>
+                    <div className="h-full flex items-center justify-center text-center p-8 border border-white/10 rounded-[24px]">
+                      <p className="text-white/40 text-sm italic font-medium">Initiate Neural Assessment for high-precision fraud detection and risk scoring.</p>
                     </div>
                   )}
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-slate-200 flex gap-3">
-                  <button className="flex-1 py-3 bg-rose-50 text-rose-600 rounded-xl font-bold hover:bg-rose-100 flex items-center justify-center gap-2">
-                    <XCircle className="w-4 h-4" />
-                    Reject
+                <div className="mt-8 pt-8 border-t border-white/10 flex gap-4 relative z-10">
+                  <button className="flex-1 py-4 bg-rose-500/10 text-rose-500 rounded-2xl font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all text-xs">
+                    Reject Claim
                   </button>
-                  <button className="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 flex items-center justify-center gap-2 shadow-lg shadow-emerald-100">
-                    <CheckCircle className="w-4 h-4" />
-                    Accept & Settle
+                  <button className="flex-1 py-4 bg-white text-[#0D0D12] rounded-2xl font-black uppercase tracking-widest hover:bg-slate-100 transition-all shadow-xl text-xs">
+                    Settle Account
                   </button>
                 </div>
               </div>
@@ -223,7 +230,6 @@ const Claims: React.FC = () => {
   );
 };
 
-// Internal icon for generic usage
 const MoreHorizontal: React.FC<{className?: string}> = ({className}) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

@@ -29,52 +29,54 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) 
   ];
 
   return (
-    <aside className="w-64 bg-white h-screen border-r border-slate-200 sticky top-0 flex flex-col">
-      <div className="p-6 flex items-center gap-3 border-b border-slate-100">
-        <div className="bg-blue-600 p-2 rounded-lg">
+    <aside className="w-64 bg-white h-full border-r border-slate-200 flex flex-col shrink-0">
+      <div className="p-8 flex items-center gap-3 border-b border-slate-100 shrink-0">
+        <div className="bg-[#0D0D12] p-2 rounded-xl shadow-lg shadow-slate-200">
           <ShieldCheck className="text-white w-6 h-6" />
         </div>
-        <h1 className="text-xl font-bold text-slate-800 tracking-tight">InsureFlow</h1>
+        <h1 className="text-xl font-bold text-[#0D0D12] tracking-tighter">InsureFlow</h1>
       </div>
       
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
         {menuItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
               activeTab === item.id 
-              ? 'bg-blue-50 text-blue-700 shadow-sm' 
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+              ? 'bg-[#0D0D12] text-white shadow-xl shadow-slate-200' 
+              : 'text-slate-500 hover:bg-slate-50 hover:text-[#0D0D12]'
             }`}
           >
             <item.icon className="w-5 h-5" />
-            <span className="font-medium">{item.label}</span>
+            <span className="font-bold text-sm tracking-tight">{item.label}</span>
             {item.id === 'notifications' && (
-              <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+              <span className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                activeTab === 'notifications' ? 'bg-white/20 text-white' : 'bg-[#0D0D12] text-white'
+              }`}>3</span>
             )}
           </button>
         ))}
       </nav>
 
-      <div className="p-4 space-y-1 border-t border-slate-100">
+      <div className="p-4 space-y-1.5 border-t border-slate-100 shrink-0">
         <button 
           onClick={() => setActiveTab('settings')}
-          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
             activeTab === 'settings' 
-            ? 'bg-blue-50 text-blue-700 shadow-sm' 
-            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+            ? 'bg-[#0D0D12] text-white shadow-xl shadow-slate-200' 
+            : 'text-slate-500 hover:bg-slate-50 hover:text-[#0D0D12]'
           }`}
         >
           <SettingsIcon className="w-5 h-5" />
-          <span className="font-medium">Settings</span>
+          <span className="font-bold text-sm tracking-tight">Settings</span>
         </button>
         <button 
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-2xl transition-all font-bold text-sm"
         >
           <LogOut className="w-5 h-5" />
-          <span className="font-medium">Logout</span>
+          <span>Logout</span>
         </button>
       </div>
     </aside>

@@ -67,86 +67,92 @@ const Settings: React.FC = () => {
   const sessionPercentage = (timeRemaining / sessionDuration) * 100;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <header className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">System Settings</h2>
-          <p className="text-slate-500">Manage your administrative profile and security preferences.</p>
+          <h2 className="text-2xl font-bold text-[#0D0D12] tracking-tight">System Environment</h2>
+          <p className="text-slate-500 font-medium">Configure terminal security and operator profile.</p>
         </div>
         <button 
           onClick={handleSave}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg ${
-            isSaved ? 'bg-emerald-500 text-white' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100'
+          className={`flex items-center gap-2 px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl ${
+            isSaved ? 'bg-emerald-500 text-white' : 'bg-[#0D0D12] text-white hover:bg-black shadow-slate-200'
           }`}
         >
-          {isSaved ? <Check className="w-5 h-5" /> : <Save className="w-5 h-5" />}
-          {isSaved ? 'Settings Saved' : 'Save Changes'}
+          {isSaved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+          {isSaved ? 'Config Synced' : 'Commit Changes'}
         </button>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {/* Profile Section */}
-          <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-slate-50 flex items-center gap-3">
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                <User className="w-5 h-5" />
+          <section className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+            <div className="p-8 border-b border-slate-50 flex items-center gap-4">
+              <div className="p-3 bg-slate-50 text-[#0D0D12] rounded-2xl shadow-inner border border-slate-100">
+                <User className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-800">Administrative Profile</h3>
+              <div>
+                <h3 className="font-black text-[#0D0D12] tracking-tight uppercase italic">Operator Identity</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Profile Management</p>
+              </div>
             </div>
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-600">Full Name</label>
+            <div className="p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-300 uppercase tracking-[2px]">Callsign</label>
                 <input 
                   type="text" 
                   defaultValue="Sarah Jenkins" 
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition-all outline-none text-slate-800"
+                  className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-[#0D0D12] transition-all outline-none text-[#0D0D12] font-bold"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-600">Role</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-300 uppercase tracking-[2px]">Authorization</label>
                 <input 
                   type="text" 
                   defaultValue="Super Admin" 
                   disabled
-                  className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed"
+                  className="w-full px-5 py-4 bg-slate-100 border border-slate-100 rounded-2xl text-slate-400 cursor-not-allowed font-bold"
                 />
               </div>
             </div>
           </section>
 
           {/* Session Management Section */}
-          <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-slate-50 flex items-center gap-3">
-              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-                <Clock className="w-5 h-5" />
+          <section className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+            <div className="p-8 border-b border-slate-50 flex items-center gap-4">
+              <div className="p-3 bg-slate-50 text-[#0D0D12] rounded-2xl shadow-inner border border-slate-100">
+                <Clock className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-800">Session Security</h3>
+              <div>
+                <h3 className="font-black text-[#0D0D12] tracking-tight uppercase italic">Secure Vault Session</h3>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Time-bound access control</p>
+              </div>
             </div>
-            <div className="p-8 space-y-8">
+            <div className="p-10 space-y-10">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
-                  <p className="font-bold text-slate-800">Current Session Active</p>
-                  <p className="text-sm text-slate-500">Your session automatically terminates after a period of inactivity.</p>
+                <div className="space-y-2">
+                  <p className="font-black text-[#0D0D12] tracking-tight italic">TERMINAL EXPIRY</p>
+                  <p className="text-sm text-slate-400 font-medium">Session automatically terminates for data protection.</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-mono font-bold text-blue-600">{formatTime(timeRemaining)}</div>
-                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Remaining</p>
+                  <div className="text-4xl font-black text-[#0D0D12] tracking-tighter italic">{formatTime(timeRemaining)}</div>
+                  <p className="text-[9px] uppercase font-black text-slate-300 tracking-[3px]">T-Minus</p>
                 </div>
               </div>
 
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                 <div 
                   className={`h-full transition-all duration-1000 ${
-                    timeRemaining < warningThreshold ? 'bg-rose-500' : 'bg-blue-600'
+                    timeRemaining < warningThreshold ? 'bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.5)]' : 'bg-[#0D0D12]'
                   }`} 
                   style={{ width: `${sessionPercentage}%` }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-600">Auto-Logout Timer</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-300 uppercase tracking-[2px]">Expiry Interval</label>
                   <select 
                     value={sessionDuration}
                     onChange={(e) => {
@@ -154,24 +160,24 @@ const Settings: React.FC = () => {
                       setSessionDuration(val);
                       setTimeRemaining(val);
                     }}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-[#0D0D12] outline-none font-bold text-[#0D0D12]"
                   >
-                    <option value={300}>5 Minutes (Demo)</option>
-                    <option value={900}>15 Minutes</option>
-                    <option value={1800}>30 Minutes</option>
-                    <option value={3600}>1 Hour</option>
+                    <option value={300}>5m Interval</option>
+                    <option value={900}>15m Interval</option>
+                    <option value={1800}>30m Interval</option>
+                    <option value={3600}>60m Interval</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-600">Warning Threshold</label>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-300 uppercase tracking-[2px]">Warning Point</label>
                   <select 
                     value={warningThreshold}
                     onChange={(e) => setWarningThreshold(parseInt(e.target.value))}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-[#0D0D12] outline-none font-bold text-[#0D0D12]"
                   >
-                    <option value={30}>30 Seconds</option>
-                    <option value={60}>1 Minute</option>
-                    <option value={300}>5 Minutes</option>
+                    <option value={30}>30s Threshold</option>
+                    <option value={60}>60s Threshold</option>
+                    <option value={300}>300s Threshold</option>
                   </select>
                 </div>
               </div>
@@ -181,43 +187,43 @@ const Settings: React.FC = () => {
 
         <div className="space-y-8">
           {/* Security Summary */}
-          <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
-                <Shield className="w-5 h-5" />
+          <section className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-8">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-slate-50 text-rose-500 rounded-2xl border border-slate-100">
+                <Shield className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-800">Security Check</h3>
+              <h3 className="font-black text-[#0D0D12] tracking-tight uppercase italic text-sm">Integrity</h3>
             </div>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
                   <Smartphone className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm font-medium text-slate-700">MFA Status</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">MFA status</span>
                 </div>
-                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">Verified</span>
+                <span className="text-[9px] font-black text-emerald-700 bg-emerald-100 px-2 py-1 rounded-lg uppercase tracking-widest">Secure</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="flex items-center gap-3">
                   <Lock className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm font-medium text-slate-700">Last Login</span>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Key Cycle</span>
                 </div>
-                <span className="text-xs font-medium text-slate-500">2h ago</span>
+                <span className="text-[9px] font-black text-[#0D0D12] bg-white border border-slate-200 px-2 py-1 rounded-lg uppercase tracking-widest italic">2h Ago</span>
               </div>
             </div>
           </section>
 
           {/* Localization */}
-          <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-slate-50 text-slate-600 rounded-lg">
-                <Globe className="w-5 h-5" />
+          <section className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-8">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl border border-slate-100">
+                <Globe className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-800">Localization</h3>
+              <h3 className="font-black text-[#0D0D12] tracking-tight uppercase italic text-sm">Region</h3>
             </div>
-            <select className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-800">
-              <option>English (United States)</option>
-              <option>French (European)</option>
+            <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-[#0D0D12] outline-none text-[#0D0D12] appearance-none">
+              <option>EN-US (GCP West)</option>
+              <option>FR-EU (GCP Paris)</option>
             </select>
           </section>
         </div>
@@ -225,34 +231,34 @@ const Settings: React.FC = () => {
 
       {/* Timeout Warning Modal */}
       {showWarning && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[32px] w-full max-w-md shadow-2xl border border-amber-100 animate-in zoom-in-95 duration-300">
-            <div className="p-10 text-center">
-              <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 relative">
-                <AlertTriangle className="w-10 h-10 text-amber-500" />
-                <div className="absolute inset-0 rounded-full border-4 border-amber-200 border-t-transparent animate-spin"></div>
+        <div className="fixed inset-0 bg-[#0D0D12]/90 backdrop-blur-xl z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[40px] w-full max-w-md shadow-2xl border border-amber-100 animate-in zoom-in-95 duration-300">
+            <div className="p-12 text-center">
+              <div className="w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-8 relative">
+                <AlertTriangle className="w-12 h-12 text-amber-500" />
+                <div className="absolute inset-0 rounded-full border-4 border-amber-200 border-t-amber-500 animate-spin"></div>
               </div>
               
-              <h3 className="text-2xl font-bold text-slate-800 mb-2">Session Expiring</h3>
-              <p className="text-slate-500 mb-8">
-                Your administrative session will automatically terminate in 
-                <span className="font-bold text-rose-600 ml-1">{timeRemaining} seconds</span>. 
-                Save your work or extend the session now.
+              <h3 className="text-3xl font-black text-[#0D0D12] mb-3 tracking-tighter italic italic">SESSION ALERT</h3>
+              <p className="text-slate-500 font-medium mb-10 leading-relaxed">
+                Terminal connection will be severed in 
+                <span className="font-black text-rose-600 ml-1 italic">{timeRemaining}s</span>. 
+                Re-authorize or terminate immediately.
               </p>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 <button 
                   onClick={handleExtendSession}
-                  className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-xl shadow-blue-100 flex items-center justify-center gap-2 transition-all active:scale-95"
+                  className="w-full py-5 bg-[#0D0D12] text-white rounded-[24px] font-black uppercase tracking-[3px] text-xs hover:bg-black shadow-2xl shadow-slate-200 flex items-center justify-center gap-3 transition-all active:scale-95"
                 >
                   <RefreshCw className="w-5 h-5" />
-                  Extend Session
+                  Renew Token
                 </button>
                 <button 
                   onClick={() => window.location.reload()}
-                  className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                  className="w-full py-5 bg-slate-50 text-slate-400 rounded-[24px] font-black uppercase tracking-[3px] text-xs hover:bg-slate-100 transition-all"
                 >
-                  Log Out Now
+                  Sever Access
                 </button>
               </div>
             </div>
@@ -262,21 +268,21 @@ const Settings: React.FC = () => {
 
       {/* Session Expired Overlay */}
       {isExpired && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[110] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#0D0D12] z-[110] flex items-center justify-center p-4 animate-in fade-in duration-1000">
           <div className="text-center text-white max-w-sm">
-            <div className="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <LogOut className="w-10 h-10 text-rose-500" />
+            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 border border-white/10 shadow-2xl">
+              <LogOut className="w-12 h-12 text-rose-500" />
             </div>
-            <h3 className="text-3xl font-bold mb-4">Session Expired</h3>
-            <p className="text-slate-400 mb-8 leading-relaxed">
-              For your security, your session has been terminated due to inactivity. 
-              Please log in again to continue managing the portal.
+            <h3 className="text-4xl font-black mb-6 tracking-tighter italic uppercase">ACCESS SEVERED</h3>
+            <p className="text-slate-500 font-medium mb-10 leading-relaxed">
+              Security protocol initiated. Inactivity threshold exceeded. 
+              Terminal access has been revoked.
             </p>
             <button 
               onClick={() => window.location.reload()}
-              className="px-10 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-slate-100 transition-all shadow-2xl"
+              className="px-12 py-5 bg-white text-[#0D0D12] rounded-[24px] font-black uppercase tracking-[4px] text-xs hover:bg-slate-100 transition-all shadow-white/10 shadow-2xl"
             >
-              Back to Login
+              Re-Authenticate
             </button>
           </div>
         </div>
