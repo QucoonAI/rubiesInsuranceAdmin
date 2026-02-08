@@ -1,7 +1,8 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Always use process.env.API_KEY directly for initialization as per guidelines
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const geminiService = {
   async generateNotification(context: { type: string, customerName: string, detail: string }) {
@@ -13,6 +14,7 @@ export const geminiService = {
       Specific Detail: ${context.detail}
       Keep it concise, clear, and include a call to action.`,
     });
+    // Use .text property directly
     return response.text;
   },
 
@@ -24,6 +26,7 @@ export const geminiService = {
       Documents Provided: ${documents.join(', ')}
       Provide a summary of validity risk and a recommendation (Accept, Further Investigation, or Reject).`,
     });
+    // Use .text property directly
     return response.text;
   },
 
@@ -33,6 +36,7 @@ export const geminiService = {
       contents: `Analyze the following insurance business data and provide 3 high-level strategic recommendations to increase retention and profitability.
       Data: ${JSON.stringify(data)}`,
     });
+    // Use .text property directly
     return response.text;
   }
 };

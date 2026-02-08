@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Search, Bell, Mail, Filter, MoreHorizontal, Send } from 'lucide-react';
+import { Search, Bell, Mail, Filter, Send, Download } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import { Customer } from '../types';
+import { exportToCSV } from '../utils/csvExport';
 
 const mockCustomers: Customer[] = [
   { id: '1', name: 'John Doe', email: 'john@example.com', phone: '+1 234 567 890', policyType: 'Life Insurance', renewalDate: '2024-12-15', status: 'Active', maturityDate: '2035-06-12' },
@@ -48,9 +49,16 @@ const Customers: React.FC = () => {
             <input 
               type="text" 
               placeholder="Search customers..." 
-              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 text-slate-800"
             />
           </div>
+          <button 
+            onClick={() => exportToCSV(mockCustomers, 'insureflow_customers')}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
           <button className="p-2 border border-slate-200 rounded-xl bg-white text-slate-600 hover:bg-slate-50">
             <Filter className="w-5 h-5" />
           </button>
@@ -130,7 +138,7 @@ const Customers: React.FC = () => {
                   <select 
                     value={notificationType}
                     onChange={(e) => setNotificationType(e.target.value)}
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800"
                   >
                     <option>Renewal Reminder</option>
                     <option>Policy Maturity Notice</option>
@@ -147,7 +155,7 @@ const Customers: React.FC = () => {
                     </div>
                   ) : (
                     <textarea 
-                      className="w-full h-full bg-transparent resize-none focus:outline-none text-slate-700"
+                      className="w-full h-full bg-transparent resize-none focus:outline-none text-slate-800"
                       value={generatedContent}
                       onChange={(e) => setGeneratedContent(e.target.value)}
                       placeholder="AI generated content will appear here..."
@@ -159,7 +167,7 @@ const Customers: React.FC = () => {
               <div className="mt-8 flex gap-3">
                 <button 
                   onClick={() => setSelectedCustomer(null)}
-                  className="flex-1 py-3 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition-all"
+                  className="flex-1 py-3 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-100 transition-all"
                 >
                   Cancel
                 </button>
@@ -177,5 +185,12 @@ const Customers: React.FC = () => {
     </div>
   );
 };
+
+// Internal icon for generic usage
+const MoreHorizontal: React.FC<{className?: string}> = ({className}) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  </svg>
+);
 
 export default Customers;

@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
 import { 
   FileSearch, MessageSquare, CheckCircle, XCircle, FileText, 
-  ArrowRight, ShieldAlert, Filter, Download, BrainCircuit
+  ArrowRight, ShieldAlert, Download, BrainCircuit
 } from 'lucide-react';
 import { Claim } from '../types';
 import { geminiService } from '../services/geminiService';
+import { exportToCSV } from '../utils/csvExport';
 
 const mockClaims: Claim[] = [
   { id: 'CLM-001', policyId: 'POL-88210', customerName: 'John Doe', amount: 5000, status: 'Registered', dateReported: '2024-02-15', docs: ['id_card.pdf', 'hospital_bill.pdf'], description: 'Sudden illness requiring hospitalization for 3 days.' },
@@ -37,12 +37,19 @@ const Claims: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <header className="flex justify-between items-center">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Claims Processing</h2>
           <p className="text-slate-500">Manage the entire lifecycle from notification to settlement.</p>
         </div>
         <div className="flex gap-2">
+          <button 
+            onClick={() => exportToCSV(mockClaims, 'insureflow_claims')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all">
             <Download className="w-4 h-4" />
             Strategic Claims Report

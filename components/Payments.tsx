@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { 
   BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell 
 } from 'recharts';
-import { DollarSign, CheckCircle2, XCircle, Clock, RefreshCw } from 'lucide-react';
+import { DollarSign, CheckCircle2, XCircle, Clock, RefreshCw, Download } from 'lucide-react';
 import { Payment } from '../types';
+import { exportToCSV } from '../utils/csvExport';
 
 const mockPayments: Payment[] = [
   { id: 'TX-100', policyId: 'POL-88210', amount: 250, date: '2024-03-01', method: 'Visa', category: 'Life', status: 'Success' },
@@ -26,15 +26,24 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 const Payments: React.FC = () => {
   return (
     <div className="space-y-6">
-      <header className="flex justify-between items-center">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Financial Reconciliation</h2>
           <p className="text-slate-500">Differentiate payments across various policy types and monitor performance.</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all">
-          <RefreshCw className="w-4 h-4" />
-          Reconcile Ledger
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => exportToCSV(mockPayments, 'insureflow_payments')}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all">
+            <RefreshCw className="w-4 h-4" />
+            Reconcile Ledger
+          </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
