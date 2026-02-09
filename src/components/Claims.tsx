@@ -1,13 +1,29 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  FileSearch, MessageSquare, CheckCircle, XCircle, FileText,
-  ArrowRight, ShieldAlert, Download, BrainCircuit
+  FileSearch, MessageSquare, FileText,
+  ArrowRight, ShieldAlert, Download, BrainCircuit, Send,
+  FileImage, Calendar, X, Eye, ChevronLeft
 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import { exportToCSV } from '../utils/csvExport';
 import { claimServiceApi } from '@/service/api/ClaimServiceApi';
 import { ApiClaim } from '@/types/api';
+import { toast } from 'sonner';
+
+const mockDocuments = [
+  { id: 1, name: 'Loss_Report.pdf', type: 'pdf', size: '2.4 MB', date: '2024-01-15' },
+  { id: 2, name: 'Photo_Evidence_1.jpg', type: 'image', size: '1.8 MB', date: '2024-01-15' },
+  { id: 3, name: 'Medical_Certificate.pdf', type: 'pdf', size: '890 KB', date: '2024-01-17' },
+  { id: 4, name: 'Police_Report.pdf', type: 'pdf', size: '1.2 MB', date: '2024-01-18' },
+];
+
+const mockMessages = [
+  { id: 1, sender: 'Customer', text: 'I have submitted all required documents for my claim.', time: '09:30 AM', isAdmin: false },
+  { id: 2, sender: 'Admin', text: 'Received. We are reviewing your documents now.', time: '02:22 PM', isAdmin: true },
+  { id: 3, sender: 'Customer', text: 'How long will the review process take?', time: '10:15 AM', isAdmin: false },
+  { id: 4, sender: 'Admin', text: "Standard review is 5-7 business days. We'll keep you updated.", time: '11:45 AM', isAdmin: true },
+];
 
 const Claims: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -23,6 +39,23 @@ const Claims: React.FC = () => {
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [analyzing, setAnalyzing] = useState(false);
 
+  // Modal view states
+  const [modalView, setModalView] = useState<'details' | 'messages'>('details');
+  const [claimAction, setClaimAction] = useState<'reject' | 'settle' | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [settleNotes, setSettleNotes] = useState('');
+  const [settleMethod, setSettleMethod] = useState('bank_transfer');
+
+  // Messaging
+  const [newMessage, setNewMessage] = useState('');
+  const [messages, setMessages] = useState(mockMessages);
+
+  // Report modal
+  const [showReport, setShowReport] = useState(false);
+  const [reportDateFrom, setReportDateFrom] = useState('');
+  const [reportDateTo, setReportDateTo] = useState('');
+  const [reportStatus, setReportStatus] = useState('all');
+
   const pipelineCounts = useMemo(() => {
     const counts: Record<string, number> = { Reported: 0, Registered: 0, Outstanding: 0, Settled: 0, Rejected: 0 };
     claims.forEach(c => {
@@ -32,13 +65,32 @@ const Claims: React.FC = () => {
     return counts;
   }, [claims]);
 
+  const filteredClaims = useMemo(() => {
+    return claims.filter(c => {
+      if (reportStatus !== 'all' && c.claimStatus !== reportStatus) return false;
+      if (reportDateFrom && c.claimCreatedAt && c.claimCreatedAt < reportDateFrom) return false;
+      if (reportDateTo && c.claimCreatedAt && c.claimCreatedAt > reportDateTo) return false;
+      return true;
+    });
+  }, [claims, reportStatus, reportDateFrom, reportDateTo]);
+
+  const reportSummary = useMemo(() => {
+    const summary: Record<string, number> = { Reported: 0, Registered: 0, Outstanding: 0, Settled: 0, Rejected: 0 };
+    filteredClaims.forEach(c => {
+      const s = c.claimStatus || '';
+      if (s in summary) summary[s]++;
+    });
+    const totalAmount = filteredClaims.reduce((sum, c) => sum + (c.claimAmount ?? 0), 0);
+    return { ...summary, total: filteredClaims.length, totalAmount };
+  }, [filteredClaims]);
+
   const runAiAnalysis = async (claim: ApiClaim) => {
     setAnalyzing(true);
     try {
       const description = `Claim #${claim.claimId} for subscription "${claim.claimSubscriptionName}" with amount $${claim.claimAmount}. Status: ${claim.claimStatus}.`;
       const result = await geminiService.analyzeClaim(description, []);
       setAiAnalysis(result || '');
-    } catch (e) {
+    } catch {
       setAiAnalysis('Analysis failed. Please review manually.');
     }
     setAnalyzing(false);
@@ -47,6 +99,45 @@ const Claims: React.FC = () => {
   const handleOpenClaim = (claim: ApiClaim) => {
     setSelectedClaim(claim);
     setAiAnalysis('');
+    setClaimAction(null);
+    setModalView('details');
+  };
+
+  const handleAcceptClaim = () => {
+    toast.success(`Claim CLM-${selectedClaim?.claimId} has been accepted`);
+    setSelectedClaim(null);
+  };
+
+  const handleConfirmReject = () => {
+    if (!rejectReason.trim()) {
+      toast.error('Please provide a reason for rejection');
+      return;
+    }
+    toast.success(`Claim CLM-${selectedClaim?.claimId} has been rejected`);
+    setClaimAction(null);
+    setRejectReason('');
+    setSelectedClaim(null);
+  };
+
+  const handleConfirmSettle = () => {
+    toast.success(`Claim CLM-${selectedClaim?.claimId} settlement of $${(selectedClaim?.claimAmount ?? 0).toLocaleString()} initiated`);
+    setClaimAction(null);
+    setSettleNotes('');
+    setSettleMethod('bank_transfer');
+    setSelectedClaim(null);
+  };
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+    setMessages(prev => [...prev, {
+      id: prev.length + 1,
+      sender: 'Admin',
+      text: newMessage,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isAdmin: true,
+    }]);
+    setNewMessage('');
+    toast.success('Message sent to customer');
   };
 
   return (
@@ -64,8 +155,11 @@ const Claims: React.FC = () => {
             <Download className="w-4 h-4" />
             Export Audit
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm">
-            <Download className="w-4 h-4" />
+          <button
+            onClick={() => setShowReport(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#0D0D12] text-white rounded-xl font-bold hover:bg-black shadow-lg shadow-slate-200 transition-all text-sm"
+          >
+            <Calendar className="w-4 h-4" />
             Strategy Report
           </button>
         </div>
@@ -97,6 +191,7 @@ const Claims: React.FC = () => {
         ))}
       </div>
 
+      {/* Claims Table */}
       <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -175,6 +270,139 @@ const Claims: React.FC = () => {
         </div>
       </div>
 
+      {/* Strategy Report Modal */}
+      {showReport && (
+        <div className="fixed inset-0 bg-[#0D0D12]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[40px] w-full max-w-4xl max-h-[90vh] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-slate-100 flex justify-between items-center">
+              <div>
+                <h3 className="text-2xl font-black text-[#0D0D12] tracking-tighter">Claims Strategy Report</h3>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Filter and export claims data</p>
+              </div>
+              <button onClick={() => setShowReport(false)} className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-8 space-y-8">
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">From Date</label>
+                  <input
+                    type="date"
+                    value={reportDateFrom}
+                    onChange={e => setReportDateFrom(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">To Date</label>
+                  <input
+                    type="date"
+                    value={reportDateTo}
+                    onChange={e => setReportDateTo(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Status</label>
+                  <select
+                    value={reportStatus}
+                    onChange={e => setReportStatus(e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="Reported">Reported</option>
+                    <option value="Registered">Registered</option>
+                    <option value="Outstanding">Outstanding</option>
+                    <option value="Settled">Settled</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <div className="text-2xl font-black text-[#0D0D12]">{reportSummary.total}</div>
+                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Claims</div>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <div className="text-2xl font-black text-[#0D0D12]">${reportSummary.totalAmount.toLocaleString()}</div>
+                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Value</div>
+                </div>
+                <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+                  <div className="text-2xl font-black text-emerald-700">{reportSummary.Settled}</div>
+                  <div className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Settled</div>
+                </div>
+                <div className="bg-rose-50 p-4 rounded-2xl border border-rose-100">
+                  <div className="text-2xl font-black text-rose-700">{reportSummary.Rejected}</div>
+                  <div className="text-[9px] font-black text-rose-600 uppercase tracking-widest">Rejected</div>
+                </div>
+              </div>
+
+              {/* Preview Table */}
+              <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <tr>
+                      <th className="px-4 py-3">Claim ID</th>
+                      <th className="px-4 py-3">Entity</th>
+                      <th className="px-4 py-3">Amount</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredClaims.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-8 text-center text-slate-400 text-sm font-medium">No claims match the selected filters</td>
+                      </tr>
+                    ) : (
+                      filteredClaims.slice(0, 20).map((claim) => (
+                        <tr key={claim.claimId} className="hover:bg-slate-50/50">
+                          <td className="px-4 py-3 font-mono text-xs font-bold text-slate-500">CLM-{claim.claimId}</td>
+                          <td className="px-4 py-3 text-sm font-bold text-[#0D0D12]">{claim.claimSubscriptionName || '—'}</td>
+                          <td className="px-4 py-3 text-sm font-black text-[#0D0D12]">${(claim.claimAmount ?? 0).toLocaleString()}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest ${
+                              claim.claimStatus === 'Settled' ? 'bg-emerald-50 text-emerald-700' :
+                              claim.claimStatus === 'Rejected' ? 'bg-rose-50 text-rose-700' :
+                              'bg-slate-100 text-slate-600'
+                            }`}>{claim.claimStatus || '—'}</span>
+                          </td>
+                          <td className="px-4 py-3 text-xs text-slate-500">{claim.claimCreatedAt || '—'}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                onClick={() => setShowReport(false)}
+                className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-all text-sm"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  exportToCSV(filteredClaims, 'rubies_claims_report');
+                  toast.success('Report exported successfully');
+                }}
+                className="px-6 py-3 bg-[#0D0D12] text-white rounded-2xl font-bold hover:bg-black shadow-lg shadow-slate-200 transition-all text-sm flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Claims Processing Modal */}
       {selectedClaim && (
         <div className="fixed inset-0 bg-[#0D0D12]/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -190,91 +418,292 @@ const Claims: React.FC = () => {
                 </div>
               </div>
               <button onClick={() => setSelectedClaim(null)} className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
-                <MoreHorizontal className="w-6 h-6 rotate-45" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Left Column */}
               <div className="space-y-8">
-                <div>
-                  <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Case Details</h4>
-                  <div className="bg-slate-50 p-6 rounded-[28px] border border-slate-100 space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-xs text-slate-400 font-bold">Subscription</span>
-                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimSubscriptionName || '—'}</span>
+                {modalView === 'details' ? (
+                  <>
+                    {/* Case Details */}
+                    <div>
+                      <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Case Details</h4>
+                      <div className="bg-slate-50 p-6 rounded-[28px] border border-slate-100 space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-xs text-slate-400 font-bold">Subscription</span>
+                          <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimSubscriptionName || '—'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-xs text-slate-400 font-bold">Status</span>
+                          <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimStatus || '—'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-xs text-slate-400 font-bold">Created</span>
+                          <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimCreatedAt || '—'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-xs text-slate-400 font-bold">Updated</span>
+                          <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimUpdatedAt || '—'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs text-slate-400 font-bold">Status</span>
-                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimStatus || '—'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs text-slate-400 font-bold">Created</span>
-                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimCreatedAt || '—'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs text-slate-400 font-bold">Updated</span>
-                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimUpdatedAt || '—'}</span>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="flex gap-4">
-                  <button className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm">
-                    <MessageSquare className="w-4 h-4" />
-                    Secure Message
-                  </button>
-                  <button className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm">
-                    <FileSearch className="w-4 h-4" />
-                    Internal Audit
-                  </button>
-                </div>
+                    {/* Supporting Documents */}
+                    <div>
+                      <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Supporting Documents</h4>
+                      <div className="space-y-2">
+                        {mockDocuments.map(doc => (
+                          <div key={doc.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-all group">
+                            <div className="p-2 bg-white rounded-xl border border-slate-100 group-hover:bg-[#0D0D12] group-hover:border-[#0D0D12] transition-colors">
+                              {doc.type === 'pdf' ? (
+                                <FileText className="w-4 h-4 text-slate-500 group-hover:text-white" />
+                              ) : (
+                                <FileImage className="w-4 h-4 text-slate-500 group-hover:text-white" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-[#0D0D12] truncate">{doc.name}</p>
+                              <p className="text-[10px] text-slate-400 font-medium">{doc.size} · {doc.date}</p>
+                            </div>
+                            <button
+                              onClick={() => toast.info(`Previewing ${doc.name}`)}
+                              className="p-2 text-slate-300 hover:text-[#0D0D12] hover:bg-white rounded-lg transition-all"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => setModalView('messages')}
+                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Secure Message
+                      </button>
+                      <button
+                        onClick={() => toast.info('Internal audit trail initiated')}
+                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
+                      >
+                        <FileSearch className="w-4 h-4" />
+                        Internal Audit
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  /* Messages View */
+                  <>
+                    <div className="flex items-center gap-3 mb-2">
+                      <button
+                        onClick={() => setModalView('details')}
+                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px]">Secure Communication</h4>
+                    </div>
+                    <div className="bg-slate-50 rounded-[28px] border border-slate-100 flex flex-col h-[420px]">
+                      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                        {messages.map(msg => (
+                          <div key={msg.id} className={`flex ${msg.isAdmin ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[80%] p-3 rounded-2xl ${
+                              msg.isAdmin
+                                ? 'bg-[#0D0D12] text-white rounded-br-lg'
+                                : 'bg-white border border-slate-200 text-slate-800 rounded-bl-lg'
+                            }`}>
+                              <p className="text-sm font-medium">{msg.text}</p>
+                              <p className={`text-[10px] mt-1 ${msg.isAdmin ? 'text-white/50' : 'text-slate-400'}`}>
+                                {msg.sender} · {msg.time}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="p-3 border-t border-slate-200">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newMessage}
+                            onChange={e => setNewMessage(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                            placeholder="Type a message..."
+                            className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
+                          />
+                          <button
+                            onClick={handleSendMessage}
+                            className="p-2.5 bg-[#0D0D12] text-white rounded-xl hover:bg-black transition-colors"
+                          >
+                            <Send className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
+              {/* Right Column - AI + Actions */}
               <div className="bg-[#0D0D12] rounded-[32px] p-8 border border-slate-800 flex flex-col shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-                <div className="flex items-center justify-between mb-8 relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
-                      <BrainCircuit className="w-5 h-5 text-white" />
+
+                {claimAction === null ? (
+                  <>
+                    {/* AI Assessment */}
+                    <div className="flex items-center justify-between mb-8 relative z-10">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                          <BrainCircuit className="w-5 h-5 text-white" />
+                        </div>
+                        <h4 className="font-bold text-white tracking-tight">AI Neural Assessment</h4>
+                      </div>
+                      <button
+                        onClick={() => runAiAnalysis(selectedClaim)}
+                        disabled={analyzing}
+                        className="text-[10px] font-black text-white/50 uppercase tracking-[2px] hover:text-white disabled:opacity-30 transition-colors"
+                      >
+                        {analyzing ? 'Processing...' : 'Recalculate'}
+                      </button>
                     </div>
-                    <h4 className="font-bold text-white tracking-tight">AI Neural Assessment</h4>
+
+                    <div className="flex-1 relative z-10">
+                      {analyzing ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center p-8">
+                          <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mb-6"></div>
+                          <p className="text-white/60 text-sm font-bold uppercase tracking-widest">Analyzing fraud patterns...</p>
+                        </div>
+                      ) : aiAnalysis ? (
+                        <div className="prose prose-invert prose-sm max-w-none">
+                          <p className="whitespace-pre-wrap text-white/80 leading-relaxed font-medium">
+                            {aiAnalysis}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-center p-8 border border-white/10 rounded-[24px]">
+                          <p className="text-white/40 text-sm italic font-medium">Initiate Neural Assessment for high-precision fraud detection and risk scoring.</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-white/10 space-y-3 relative z-10">
+                      <button
+                        onClick={handleAcceptClaim}
+                        className="w-full py-4 bg-emerald-500/10 text-emerald-400 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all text-xs"
+                      >
+                        Accept Claim
+                      </button>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setClaimAction('reject')}
+                          className="flex-1 py-4 bg-rose-500/10 text-rose-500 rounded-2xl font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all text-xs"
+                        >
+                          Reject Claim
+                        </button>
+                        <button
+                          onClick={() => setClaimAction('settle')}
+                          className="flex-1 py-4 bg-white text-[#0D0D12] rounded-2xl font-black uppercase tracking-widest hover:bg-slate-100 transition-all shadow-xl text-xs"
+                        >
+                          Settle Account
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : claimAction === 'reject' ? (
+                  /* Reject Form */
+                  <div className="flex flex-col h-full relative z-10">
+                    <div className="flex items-center gap-3 mb-8">
+                      <button onClick={() => setClaimAction(null)} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                        <ChevronLeft className="w-5 h-5 text-white" />
+                      </button>
+                      <h4 className="font-bold text-white tracking-tight">Reject Claim</h4>
+                    </div>
+                    <div className="flex-1 space-y-6">
+                      <div className="bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20">
+                        <p className="text-rose-400 text-sm font-bold">You are about to reject claim CLM-{selectedClaim.claimId} for ${(selectedClaim.claimAmount ?? 0).toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Reason for Rejection *</label>
+                        <textarea
+                          value={rejectReason}
+                          onChange={e => setRejectReason(e.target.value)}
+                          placeholder="Provide detailed reason for claim rejection..."
+                          rows={4}
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder:text-white/20 focus:ring-2 focus:ring-rose-500 focus:outline-none resize-none"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-3 mt-8">
+                      <button
+                        onClick={() => { setClaimAction(null); setRejectReason(''); }}
+                        className="flex-1 py-4 bg-white/5 text-white/60 rounded-2xl font-bold hover:bg-white/10 transition-all text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleConfirmReject}
+                        className="flex-1 py-4 bg-rose-500 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-rose-600 transition-all text-xs shadow-xl"
+                      >
+                        Confirm Rejection
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => runAiAnalysis(selectedClaim)}
-                    disabled={analyzing}
-                    className="text-[10px] font-black text-white/50 uppercase tracking-[2px] hover:text-white disabled:opacity-30 transition-colors"
-                  >
-                    {analyzing ? 'Processing...' : 'Recalculate'}
-                  </button>
-                </div>
-
-                <div className="flex-1 relative z-10">
-                  {analyzing ? (
-                    <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                      <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mb-6"></div>
-                      <p className="text-white/60 text-sm font-bold uppercase tracking-widest">Analyzing fraud patterns...</p>
+                ) : (
+                  /* Settle Form */
+                  <div className="flex flex-col h-full relative z-10">
+                    <div className="flex items-center gap-3 mb-8">
+                      <button onClick={() => setClaimAction(null)} className="p-2 bg-white/10 rounded-xl hover:bg-white/20 transition-colors">
+                        <ChevronLeft className="w-5 h-5 text-white" />
+                      </button>
+                      <h4 className="font-bold text-white tracking-tight">Settle Claim</h4>
                     </div>
-                  ) : aiAnalysis ? (
-                    <div className="prose prose-invert prose-sm max-w-none">
-                      <p className="whitespace-pre-wrap text-white/80 leading-relaxed font-medium">
-                        {aiAnalysis}
-                      </p>
+                    <div className="flex-1 space-y-6">
+                      <div className="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20">
+                        <p className="text-emerald-400 text-sm font-bold">Settlement for CLM-{selectedClaim.claimId} — ${(selectedClaim.claimAmount ?? 0).toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Payment Method</label>
+                        <select
+                          value={settleMethod}
+                          onChange={e => setSettleMethod(e.target.value)}
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        >
+                          <option value="bank_transfer" className="bg-[#0D0D12]">Bank Transfer</option>
+                          <option value="cheque" className="bg-[#0D0D12]">Cheque</option>
+                          <option value="mobile_money" className="bg-[#0D0D12]">Mobile Money</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Notes</label>
+                        <textarea
+                          value={settleNotes}
+                          onChange={e => setSettleNotes(e.target.value)}
+                          placeholder="Additional settlement notes..."
+                          rows={3}
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder:text-white/20 focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none"
+                        />
+                      </div>
                     </div>
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-center p-8 border border-white/10 rounded-[24px]">
-                      <p className="text-white/40 text-sm italic font-medium">Initiate Neural Assessment for high-precision fraud detection and risk scoring.</p>
+                    <div className="flex gap-3 mt-8">
+                      <button
+                        onClick={() => { setClaimAction(null); setSettleNotes(''); }}
+                        className="flex-1 py-4 bg-white/5 text-white/60 rounded-2xl font-bold hover:bg-white/10 transition-all text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleConfirmSettle}
+                        className="flex-1 py-4 bg-white text-[#0D0D12] rounded-2xl font-black uppercase tracking-widest hover:bg-slate-100 transition-all text-xs shadow-xl"
+                      >
+                        Confirm Settlement
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                <div className="mt-8 pt-8 border-t border-white/10 flex gap-4 relative z-10">
-                  <button className="flex-1 py-4 bg-rose-500/10 text-rose-500 rounded-2xl font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all text-xs">
-                    Reject Claim
-                  </button>
-                  <button className="flex-1 py-4 bg-white text-[#0D0D12] rounded-2xl font-black uppercase tracking-widest hover:bg-slate-100 transition-all shadow-xl text-xs">
-                    Settle Account
-                  </button>
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -283,11 +712,5 @@ const Claims: React.FC = () => {
     </div>
   );
 };
-
-const MoreHorizontal: React.FC<{className?: string}> = ({className}) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-  </svg>
-);
 
 export default Claims;
