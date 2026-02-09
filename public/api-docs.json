@@ -1,0 +1,1935 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Rubies Insurance Documentation",
+    "version": "1.0.0",
+    "title": "Rubies Insurance Documentation"
+  },
+  "host": "ohtmdjkekh.execute-api.us-east-1.amazonaws.com",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "authentication-controller",
+      "description": "Authentication Controller"
+    },
+    {
+      "name": "claim-controller",
+      "description": "Claim Controller"
+    },
+    {
+      "name": "dashboard-controller",
+      "description": "Dashboard Controller"
+    },
+    {
+      "name": "health-controller",
+      "description": "Health Controller"
+    },
+    {
+      "name": "kyc-controller",
+      "description": "Kyc Controller"
+    },
+    {
+      "name": "payment-controller",
+      "description": "Payment Controller"
+    },
+    {
+      "name": "policy-controller",
+      "description": "Policy Controller"
+    },
+    {
+      "name": "subscription-controller",
+      "description": "Subscription Controller"
+    },
+    {
+      "name": "webhook-controller",
+      "description": "Webhook Controller"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["health-controller"],
+        "summary": "healthCheck",
+        "operationId": "healthCheckUsingGET",
+        "produces": ["*/*"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/change-password": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "changePassword",
+        "operationId": "changePasswordUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ChangePasswordRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/complete-enrollment": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "completeEnrollment",
+        "operationId": "completeEnrollmentUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompleteEnrollmentRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/complete-password-reset": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "completePasswordReset",
+        "operationId": "completePasswordResetUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CompletePasswordResetRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/initiate-enrollment": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "initiateEnrollment",
+        "operationId": "initiateEnrollmentUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InitiateEnrollmentRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/initiate-password-reset": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "initiatePasswordReset",
+        "operationId": "initiatePasswordResetUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InitiatePasswordResetRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/login": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "login",
+        "operationId": "loginUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/me": {
+      "get": {
+        "tags": ["authentication-controller"],
+        "summary": "userDetails",
+        "operationId": "userDetailsUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/resend-otp": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "resendOtp",
+        "operationId": "resendOtpUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InitiatePasswordResetRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/claims": {
+      "get": {
+        "tags": ["claim-controller"],
+        "summary": "read",
+        "operationId": "readUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ClaimReadListResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": ["claim-controller"],
+        "summary": "create",
+        "operationId": "createUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subscriptionId",
+            "in": "query",
+            "description": "subscriptionId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/dashboard": {
+      "get": {
+        "tags": ["dashboard-controller"],
+        "summary": "getDashboard",
+        "operationId": "getDashboardUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DashboardResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/kyc/nin/validate": {
+      "post": {
+        "tags": ["kyc-controller"],
+        "summary": "validateNin",
+        "operationId": "validateNinUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NinValidationRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/kyc/nok/validate": {
+      "post": {
+        "tags": ["kyc-controller"],
+        "summary": "validateNOK",
+        "operationId": "validateNOKUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NOKValidationRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/kyc/user/validate": {
+      "post": {
+        "tags": ["kyc-controller"],
+        "summary": "validateUserDetails",
+        "operationId": "validateUserDetailsUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserValidationRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/payment/account/enquiry": {
+      "get": {
+        "tags": ["payment-controller"],
+        "summary": "nameEnquiry",
+        "operationId": "nameEnquiryUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AccountNameEnquiryRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AccountNameEnquiryResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/payment/accounts": {
+      "get": {
+        "tags": ["payment-controller"],
+        "summary": "getPaymentAccounts",
+        "operationId": "getPaymentAccountsUsingGET",
+        "produces": ["*/*"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PaymentAccountResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": ["payment-controller"],
+        "summary": "addPaymentAccount",
+        "operationId": "addPaymentAccountUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddPaymentAccountRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/payment/banks": {
+      "get": {
+        "tags": ["payment-controller"],
+        "summary": "getBanks",
+        "operationId": "getBanksUsingGET",
+        "produces": ["*/*"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BankListResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/payment/confirm/{reference}": {
+      "post": {
+        "tags": ["payment-controller"],
+        "summary": "confirm",
+        "operationId": "confirmUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "reference",
+            "in": "path",
+            "description": "reference",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/payment/generate": {
+      "post": {
+        "tags": ["payment-controller"],
+        "summary": "generate",
+        "operationId": "generateUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "policyName",
+            "in": "query",
+            "description": "policyName",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VirtualAccountGenerationRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/VirtualAccountGenerationResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/policy/travel/details": {
+      "get": {
+        "tags": ["policy-controller"],
+        "summary": "getTravelDetails",
+        "operationId": "getTravelDetailsUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "destination",
+            "in": "query",
+            "description": "destination",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "origin",
+            "in": "query",
+            "description": "origin",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/TravelDetailsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/subscriptions": {
+      "get": {
+        "tags": ["subscription-controller"],
+        "summary": "read",
+        "operationId": "readUsingGET_1",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "policyName",
+            "in": "query",
+            "description": "policyName",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/SubscriptionReadListResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/subscriptions/{subscriptionId}/renew": {
+      "get": {
+        "tags": ["subscription-controller"],
+        "summary": "renewSubscription",
+        "operationId": "renewSubscriptionUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "description": "subscriptionId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/VirtualAccountGenerationResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/webhook/payment": {
+      "post": {
+        "tags": ["webhook-controller"],
+        "summary": "processPayment",
+        "operationId": "processPaymentUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/webhook/payment/renewal": {
+      "post": {
+        "tags": ["webhook-controller"],
+        "summary": "renewSubscription",
+        "operationId": "renewSubscriptionUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/webhook/subscriptions/check": {
+      "post": {
+        "tags": ["webhook-controller"],
+        "summary": "checkSubscriptions",
+        "operationId": "checkSubscriptionsUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AccountNameEnquiryRequest": {
+      "type": "object",
+      "required": ["accountNumber", "bankCode"],
+      "properties": {
+        "accountNumber": {
+          "type": "string"
+        },
+        "bankCode": {
+          "type": "string"
+        }
+      },
+      "title": "AccountNameEnquiryRequest"
+    },
+    "AccountNameEnquiryResponse": {
+      "type": "object",
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "bankCode": {
+          "type": "string"
+        },
+        "bankName": {
+          "type": "string"
+        },
+        "bvn": {
+          "type": "string"
+        },
+        "kyc": {
+          "type": "string"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "title": "AccountNameEnquiryResponse"
+    },
+    "AddPaymentAccountRequest": {
+      "type": "object",
+      "required": ["accountName", "accountNumber", "bankCode"],
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "bankCode": {
+          "type": "string"
+        }
+      },
+      "title": "AddPaymentAccountRequest"
+    },
+    "BankListResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BankListResponseData"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "BankListResponse"
+    },
+    "BankListResponseData": {
+      "type": "object",
+      "properties": {
+        "bankCode": {
+          "type": "string"
+        },
+        "bankLogoUrl": {
+          "type": "string"
+        },
+        "bankName": {
+          "type": "string"
+        },
+        "bankShortName": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "title": "BankListResponseData"
+    },
+    "BaseResponse": {
+      "type": "object",
+      "required": ["responseCode", "responseMessage"],
+      "properties": {
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "BaseResponse"
+    },
+    "ChangePasswordRequest": {
+      "type": "object",
+      "required": ["userPassword"],
+      "properties": {
+        "oldPassword": {
+          "type": "string"
+        },
+        "userPassword": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "title": "ChangePasswordRequest"
+    },
+    "Claim": {
+      "type": "object",
+      "properties": {
+        "claimAmount": {
+          "type": "number"
+        },
+        "claimCreatedAt": {
+          "type": "string"
+        },
+        "claimId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "claimStatus": {
+          "type": "string"
+        },
+        "claimSubscriptionId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "claimSubscriptionName": {
+          "type": "string"
+        },
+        "claimUpdatedAt": {
+          "type": "string"
+        },
+        "claimUserId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Claim"
+    },
+    "ClaimReadListResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Claim"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "ClaimReadListResponse"
+    },
+    "CompleteEnrollmentRequest": {
+      "type": "object",
+      "properties": {
+        "otp": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "userPassword": {
+          "type": "string"
+        }
+      },
+      "title": "CompleteEnrollmentRequest"
+    },
+    "CompletePasswordResetRequest": {
+      "type": "object",
+      "properties": {
+        "otp": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "userPassword": {
+          "type": "string"
+        }
+      },
+      "title": "CompletePasswordResetRequest"
+    },
+    "DashboardDataCoverage": {
+      "type": "object",
+      "required": [
+        "creditLifeCoverage",
+        "eduCareCoverage",
+        "shieldCoverage",
+        "tenantCoverage",
+        "totalCoverage",
+        "travelCoverage",
+        "vehicleCoverage"
+      ],
+      "properties": {
+        "creditLifeCoverage": {
+          "type": "number"
+        },
+        "eduCareCoverage": {
+          "type": "number"
+        },
+        "shieldCoverage": {
+          "type": "number"
+        },
+        "tenantCoverage": {
+          "type": "number"
+        },
+        "totalCoverage": {
+          "type": "number"
+        },
+        "travelCoverage": {
+          "type": "number"
+        },
+        "vehicleCoverage": {
+          "type": "number"
+        }
+      },
+      "title": "DashboardDataCoverage"
+    },
+    "DashboardResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/DashboardResponseData"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "DashboardResponse"
+    },
+    "DashboardResponseData": {
+      "type": "object",
+      "required": [
+        "activePlanCount",
+        "activePolicies",
+        "claimCount",
+        "coverage"
+      ],
+      "properties": {
+        "activePlanCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "activePolicies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "claimCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "coverage": {
+          "$ref": "#/definitions/DashboardDataCoverage"
+        }
+      },
+      "title": "DashboardResponseData"
+    },
+    "InitiateEnrollmentRequest": {
+      "type": "object",
+      "properties": {
+        "userEmail": {
+          "type": "string"
+        },
+        "userFirstName": {
+          "type": "string"
+        },
+        "userLastName": {
+          "type": "string"
+        },
+        "userNumber": {
+          "type": "string"
+        }
+      },
+      "title": "InitiateEnrollmentRequest"
+    },
+    "InitiatePasswordResetRequest": {
+      "type": "object",
+      "properties": {
+        "userEmail": {
+          "type": "string"
+        }
+      },
+      "title": "InitiatePasswordResetRequest"
+    },
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "deviceId": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "userPassword": {
+          "type": "string"
+        }
+      },
+      "title": "LoginRequest"
+    },
+    "LoginResponse": {
+      "type": "object",
+      "required": ["privileges"],
+      "properties": {
+        "nextOfKinVerified": {
+          "type": "boolean"
+        },
+        "ninVerified": {
+          "type": "boolean"
+        },
+        "privileges": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "userAddress": {
+          "type": "string"
+        },
+        "userCreatedAt": {
+          "type": "string"
+        },
+        "userDetailsProvided": {
+          "type": "boolean"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "userFirstName": {
+          "type": "string"
+        },
+        "userGender": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "userLastName": {
+          "type": "string"
+        },
+        "userNumber": {
+          "type": "string"
+        },
+        "userRoleId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "userStatus": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string"
+        },
+        "userUpdatedAt": {
+          "type": "string"
+        }
+      },
+      "title": "LoginResponse"
+    },
+    "NOKValidationRequest": {
+      "type": "object",
+      "required": ["firstName", "lastName"],
+      "properties": {
+        "emailAddress": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        }
+      },
+      "title": "NOKValidationRequest"
+    },
+    "NinValidationRequest": {
+      "type": "object",
+      "required": ["nin"],
+      "properties": {
+        "nin": {
+          "type": "string"
+        }
+      },
+      "title": "NinValidationRequest"
+    },
+    "PaymentAccount": {
+      "type": "object",
+      "required": ["accountNumber", "isPrimary", "status", "userId"],
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "bankCode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isPrimary": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "PaymentAccount"
+    },
+    "PaymentAccountResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PaymentAccount"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "PaymentAccountResponse"
+    },
+    "Subscription": {
+      "type": "object",
+      "required": ["subscriptionToBeRenewed"],
+      "properties": {
+        "daysBetweenPayments": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nextPaymentDate": {
+          "type": "string"
+        },
+        "subscriptionAssuredSum": {
+          "type": "number"
+        },
+        "subscriptionContributionFrequency": {
+          "type": "string"
+        },
+        "subscriptionCreatedAt": {
+          "type": "string"
+        },
+        "subscriptionEndDate": {
+          "type": "string"
+        },
+        "subscriptionExtraData": {
+          "type": "string"
+        },
+        "subscriptionId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "subscriptionInsuranceDuration": {
+          "type": "string"
+        },
+        "subscriptionPaymentAmount": {
+          "type": "number"
+        },
+        "subscriptionPolicyId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "subscriptionPolicyName": {
+          "type": "string"
+        },
+        "subscriptionStatus": {
+          "type": "string"
+        },
+        "subscriptionToBeRenewed": {
+          "type": "boolean"
+        },
+        "subscriptionUpdatedAt": {
+          "type": "string"
+        },
+        "subscriptionUserId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalCoverage": {
+          "type": "number"
+        }
+      },
+      "title": "Subscription"
+    },
+    "SubscriptionReadListResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Subscription"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "SubscriptionReadListResponse"
+    },
+    "TravelDetails": {
+      "type": "object",
+      "required": ["distance", "price"],
+      "properties": {
+        "distance": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "price": {
+          "type": "number"
+        }
+      },
+      "title": "TravelDetails"
+    },
+    "TravelDetailsResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/TravelDetails"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "TravelDetailsResponse"
+    },
+    "UserValidationRequest": {
+      "type": "object",
+      "required": ["dateOfBirth", "gender"],
+      "properties": {
+        "dateOfBirth": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "homeAddress": {
+          "type": "string"
+        }
+      },
+      "title": "UserValidationRequest"
+    },
+    "VirtualAccountGenerationRequest": {
+      "type": "object",
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "assuredSum": {
+          "type": "string"
+        },
+        "bankCode": {
+          "type": "string"
+        },
+        "contributionFrequency": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        },
+        "daysBeforeNextPayment": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "daysBeforeSubscriptionEnds": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "insuranceDuration": {
+          "type": "string"
+        },
+        "paymentAmount": {
+          "type": "string"
+        },
+        "s3Url": {
+          "type": "string"
+        }
+      },
+      "title": "VirtualAccountGenerationRequest"
+    },
+    "VirtualAccountGenerationResponse": {
+      "type": "object",
+      "required": [
+        "accountName",
+        "accountNumber",
+        "reference",
+        "responseCode",
+        "responseMessage"
+      ],
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "accountNumber": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "VirtualAccountGenerationResponse"
+    }
+  }
+}

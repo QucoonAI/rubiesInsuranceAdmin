@@ -1,24 +1,16 @@
 
 import React, { useState } from 'react';
-import { ShieldCheck, Mail, Lock, ArrowRight, Github, Chrome } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Github, Chrome } from 'lucide-react';
+import { authServiceApi } from '@/service/api/AuthServiceApi';
 
-interface LoginProps {
-  onLogin: () => void;
-}
+const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [login, { isLoading }] = authServiceApi.useLoginMutation();
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [email, setEmail] = useState('admin@insureflow.io');
-  const [password, setPassword] = useState('password123');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    // Simulate API delay
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin();
-    }, 1500);
+    await login({ userEmail: email, userPassword: password });
   };
 
   return (
@@ -33,10 +25,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <div className="relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
             <div className="flex items-center gap-3 mb-16 relative z-10">
-              <div className="bg-white/10 p-2.5 rounded-2xl backdrop-blur-xl border border-white/10 shadow-2xl">
-                <ShieldCheck className="w-8 h-8 text-white" />
-              </div>
-              <span className="text-2xl font-black tracking-tighter italic">InsureFlow</span>
+              <img src="/logo.svg" alt="Rubies Insure" className="w-12 h-12 rounded-2xl" />
+              <span className="text-2xl font-black tracking-tighter italic">Rubies Insure</span>
             </div>
             <h2 className="text-5xl font-black leading-[1.1] mb-8 tracking-tighter">
               The premium <span className="text-slate-500 italic">standard</span> for risk management.
@@ -47,9 +37,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </div>
           
           <div className="flex items-center gap-5 bg-white/5 p-6 rounded-[28px] backdrop-blur-md border border-white/5 shadow-inner">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-white" />
-            </div>
+            <img src="/logo.svg" alt="Rubies Insure" className="w-12 h-12 rounded-2xl" />
             <p className="text-xs font-bold uppercase tracking-widest text-white/50 leading-relaxed">Enterprise Security Protocol v2.4 Enabled</p>
           </div>
         </div>
@@ -71,7 +59,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-[20px] focus:outline-none focus:ring-2 focus:ring-[#0D0D12] focus:bg-white transition-all text-slate-900 font-bold placeholder:text-slate-300"
-                  placeholder="admin@insureflow.io"
+                  placeholder="admin@rubiesinsure.com"
                   required
                 />
               </div>

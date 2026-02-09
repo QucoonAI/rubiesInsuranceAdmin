@@ -7,7 +7,6 @@ import {
   AlertCircle, 
   LayoutDashboard,
   Settings as SettingsIcon,
-  ShieldCheck,
   LogOut,
   Bell
 } from 'lucide-react';
@@ -31,10 +30,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) 
   return (
     <aside className="w-64 bg-white h-full border-r border-slate-200 flex flex-col shrink-0">
       <div className="p-8 flex items-center gap-3 border-b border-slate-100 shrink-0">
-        <div className="bg-[#0D0D12] p-2 rounded-xl shadow-lg shadow-slate-200">
-          <ShieldCheck className="text-white w-6 h-6" />
-        </div>
-        <h1 className="text-xl font-bold text-[#0D0D12] tracking-tighter">InsureFlow</h1>
+        <img src="/logo.svg" alt="Rubies Insure" className="w-10 h-10 rounded-xl" />
+        <h1 className="text-xl font-bold text-[#0D0D12] tracking-tighter">Rubies Insure</h1>
       </div>
       
       <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">

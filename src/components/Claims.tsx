@@ -1,29 +1,36 @@
 
-import React, { useState } from 'react';
-import { 
-  FileSearch, MessageSquare, CheckCircle, XCircle, FileText, 
+import React, { useState, useMemo } from 'react';
+import {
+  FileSearch, MessageSquare, CheckCircle, XCircle, FileText,
   ArrowRight, ShieldAlert, Download, BrainCircuit
 } from 'lucide-react';
-import { Claim } from '../types';
 import { geminiService } from '../services/geminiService';
 import { exportToCSV } from '../utils/csvExport';
-
-const mockClaims: Claim[] = [
-  { id: 'CLM-001', policyId: 'POL-88210', customerName: 'John Doe', amount: 5000, status: 'Registered', dateReported: '2024-02-15', docs: ['id_card.pdf', 'hospital_bill.pdf'], description: 'Sudden illness requiring hospitalization for 3 days.' },
-  { id: 'CLM-002', policyId: 'POL-99122', customerName: 'Alice Smith', amount: 1200, status: 'Reported', dateReported: '2024-03-01', docs: ['photo_car.jpg', 'police_report.pdf'], description: 'Minor bumper damage in parking lot collision.' },
-  { id: 'CLM-003', policyId: 'POL-44567', customerName: 'Bob Johnson', amount: 25000, status: 'Settled', dateReported: '2023-11-20', docs: ['death_cert.pdf', 'beneficiary_id.pdf'], description: 'Maturity of savings plan benefit payout.' },
-  { id: 'CLM-004', policyId: 'POL-11223', customerName: 'Emma Wilson', amount: 800, status: 'Rejected', dateReported: '2024-01-10', docs: [], description: 'Claim for normal wear and tear on property (excluded).' },
-];
+import { claimServiceApi } from '@/service/api/ClaimServiceApi';
+import { ApiClaim } from '@/types/api';
 
 const Claims: React.FC = () => {
-  const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
+  const { data, isLoading, isError, refetch } = claimServiceApi.useGetClaimsQuery();
+  const claims = data?.data ?? [];
+
+  const [selectedClaim, setSelectedClaim] = useState<ApiClaim | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [analyzing, setAnalyzing] = useState(false);
 
-  const runAiAnalysis = async (claim: Claim) => {
+  const pipelineCounts = useMemo(() => {
+    const counts: Record<string, number> = { Reported: 0, Registered: 0, Outstanding: 0, Settled: 0, Rejected: 0 };
+    claims.forEach(c => {
+      const status = c.claimStatus || '';
+      if (status in counts) counts[status]++;
+    });
+    return counts;
+  }, [claims]);
+
+  const runAiAnalysis = async (claim: ApiClaim) => {
     setAnalyzing(true);
     try {
-      const result = await geminiService.analyzeClaim(claim.description, claim.docs);
+      const description = `Claim #${claim.claimId} for subscription "${claim.claimSubscriptionName}" with amount $${claim.claimAmount}. Status: ${claim.claimStatus}.`;
+      const result = await geminiService.analyzeClaim(description, []);
       setAiAnalysis(result || '');
     } catch (e) {
       setAiAnalysis('Analysis failed. Please review manually.');
@@ -31,7 +38,7 @@ const Claims: React.FC = () => {
     setAnalyzing(false);
   };
 
-  const handleOpenClaim = (claim: Claim) => {
+  const handleOpenClaim = (claim: ApiClaim) => {
     setSelectedClaim(claim);
     setAiAnalysis('');
   };
@@ -44,8 +51,8 @@ const Claims: React.FC = () => {
           <p className="text-slate-500 font-medium">End-to-end lifecycle tracking for global risk management.</p>
         </div>
         <div className="flex gap-2">
-          <button 
-            onClick={() => exportToCSV(mockClaims, 'insureflow_claims')}
+          <button
+            onClick={() => exportToCSV(claims, 'rubies_insure_claims')}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm"
           >
             <Download className="w-4 h-4" />
@@ -58,18 +65,27 @@ const Claims: React.FC = () => {
         </div>
       </header>
 
+      {isError && (
+        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center">
+          <p className="text-rose-600 font-bold text-sm mb-2">Failed to load claims</p>
+          <button onClick={() => refetch()} className="text-xs font-bold text-rose-700 underline">Retry</button>
+        </div>
+      )}
+
       {/* Pipeline Visualization */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { label: 'Reported', count: 12, color: 'bg-[#0D0D12]' },
-          { label: 'Registered', count: 8, color: 'bg-[#0D0D12]/60' },
-          { label: 'Outstanding', count: 15, color: 'bg-amber-500' },
-          { label: 'Settled', count: 42, color: 'bg-emerald-500' },
-          { label: 'Rejected', count: 5, color: 'bg-rose-500' },
+          { label: 'Reported', color: 'bg-[#0D0D12]' },
+          { label: 'Registered', color: 'bg-[#0D0D12]/60' },
+          { label: 'Outstanding', color: 'bg-amber-500' },
+          { label: 'Settled', color: 'bg-emerald-500' },
+          { label: 'Rejected', color: 'bg-rose-500' },
         ].map((step, idx) => (
           <div key={idx} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm group hover:shadow-lg transition-all">
             <div className={`w-8 h-1 rounded-full ${step.color} mb-4`} />
-            <div className="text-3xl font-black text-[#0D0D12] tracking-tighter">{step.count}</div>
+            <div className={`text-3xl font-black text-[#0D0D12] tracking-tighter ${isLoading ? 'animate-pulse bg-slate-100 rounded w-12 h-9' : ''}`}>
+              {isLoading ? '' : pipelineCounts[step.label] ?? 0}
+            </div>
             <div className="text-[9px] text-slate-400 font-black uppercase tracking-[2px]">{step.label}</div>
           </div>
         ))}
@@ -88,31 +104,45 @@ const Claims: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {mockClaims.map((claim) => (
-              <tr key={claim.id} className="hover:bg-slate-50/50 transition-colors group">
-                <td className="px-6 py-5 font-mono text-xs font-bold text-slate-400 group-hover:text-[#0D0D12]">{claim.id}</td>
-                <td className="px-6 py-5 font-bold text-[#0D0D12]">{claim.customerName}</td>
-                <td className="px-6 py-5 font-black text-[#0D0D12]">${claim.amount.toLocaleString()}</td>
-                <td className="px-6 py-5">
-                  <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
-                    claim.status === 'Settled' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                    claim.status === 'Rejected' ? 'bg-rose-50 text-rose-700 border-rose-100' :
-                    claim.status === 'Registered' ? 'bg-[#0D0D12]/5 text-[#0D0D12] border-[#0D0D12]/10' : 'bg-slate-100 text-slate-600 border-slate-200'
-                  }`}>
-                    {claim.status}
-                  </span>
-                </td>
-                <td className="px-6 py-5 text-sm font-medium text-slate-500">{claim.dateReported}</td>
-                <td className="px-6 py-5 text-right">
-                  <button 
-                    onClick={() => handleOpenClaim(claim)}
-                    className="p-2 bg-slate-100 text-[#0D0D12] rounded-xl hover:bg-[#0D0D12] hover:text-white transition-all shadow-sm"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </td>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <tr key={idx}>
+                  <td colSpan={6} className="px-6 py-5">
+                    <div className="animate-pulse bg-slate-100 rounded-lg h-5 w-full" />
+                  </td>
+                </tr>
+              ))
+            ) : claims.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-12 text-center text-slate-400 font-bold text-sm">No claims found</td>
               </tr>
-            ))}
+            ) : (
+              claims.map((claim) => (
+                <tr key={claim.claimId} className="hover:bg-slate-50/50 transition-colors group">
+                  <td className="px-6 py-5 font-mono text-xs font-bold text-slate-400 group-hover:text-[#0D0D12]">CLM-{claim.claimId}</td>
+                  <td className="px-6 py-5 font-bold text-[#0D0D12]">{claim.claimSubscriptionName || '—'}</td>
+                  <td className="px-6 py-5 font-black text-[#0D0D12]">${(claim.claimAmount ?? 0).toLocaleString()}</td>
+                  <td className="px-6 py-5">
+                    <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                      claim.claimStatus === 'Settled' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                      claim.claimStatus === 'Rejected' ? 'bg-rose-50 text-rose-700 border-rose-100' :
+                      claim.claimStatus === 'Registered' ? 'bg-[#0D0D12]/5 text-[#0D0D12] border-[#0D0D12]/10' : 'bg-slate-100 text-slate-600 border-slate-200'
+                    }`}>
+                      {claim.claimStatus || '—'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-sm font-medium text-slate-500">{claim.claimCreatedAt || '—'}</td>
+                  <td className="px-6 py-5 text-right">
+                    <button
+                      onClick={() => handleOpenClaim(claim)}
+                      className="p-2 bg-slate-100 text-[#0D0D12] rounded-xl hover:bg-[#0D0D12] hover:text-white transition-all shadow-sm"
+                    >
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -127,8 +157,8 @@ const Claims: React.FC = () => {
                   <ShieldAlert className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-[#0D0D12] tracking-tighter uppercase italic">{selectedClaim.id} — Portfolio Review</h3>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Adjusting valuation: <span className="text-[#0D0D12]">${selectedClaim.amount.toLocaleString()}.00</span></p>
+                  <h3 className="text-2xl font-black text-[#0D0D12] tracking-tighter uppercase italic">CLM-{selectedClaim.claimId} — Portfolio Review</h3>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Adjusting valuation: <span className="text-[#0D0D12]">${(selectedClaim.claimAmount ?? 0).toLocaleString()}.00</span></p>
                 </div>
               </div>
               <button onClick={() => setSelectedClaim(null)} className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
@@ -139,28 +169,24 @@ const Claims: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
               <div className="space-y-8">
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Case Deposition</h4>
-                  <p className="text-slate-600 font-medium leading-relaxed bg-slate-50 p-6 rounded-[28px] border border-slate-100 italic">
-                    "{selectedClaim.description}"
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Digital Evidence</h4>
-                  <div className="grid grid-cols-1 gap-3">
-                    {selectedClaim.docs.length > 0 ? selectedClaim.docs.map((doc, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-[20px] hover:border-[#0D0D12] cursor-pointer transition-all group">
-                        <div className="flex items-center gap-4">
-                          <FileText className="w-5 h-5 text-slate-400 group-hover:text-[#0D0D12]" />
-                          <span className="text-sm font-bold text-slate-600 group-hover:text-[#0D0D12]">{doc}</span>
-                        </div>
-                        <Download className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    )) : (
-                      <div className="p-8 border-2 border-dashed border-slate-100 rounded-[20px] text-center">
-                        <p className="text-sm text-slate-300 font-bold uppercase tracking-widest">No evidence uploaded</p>
-                      </div>
-                    )}
+                  <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Case Details</h4>
+                  <div className="bg-slate-50 p-6 rounded-[28px] border border-slate-100 space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-xs text-slate-400 font-bold">Subscription</span>
+                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimSubscriptionName || '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-xs text-slate-400 font-bold">Status</span>
+                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimStatus || '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-xs text-slate-400 font-bold">Created</span>
+                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimCreatedAt || '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-xs text-slate-400 font-bold">Updated</span>
+                      <span className="text-sm font-bold text-[#0D0D12]">{selectedClaim.claimUpdatedAt || '—'}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -185,7 +211,7 @@ const Claims: React.FC = () => {
                     </div>
                     <h4 className="font-bold text-white tracking-tight">AI Neural Assessment</h4>
                   </div>
-                  <button 
+                  <button
                     onClick={() => runAiAnalysis(selectedClaim)}
                     disabled={analyzing}
                     className="text-[10px] font-black text-white/50 uppercase tracking-[2px] hover:text-white disabled:opacity-30 transition-colors"

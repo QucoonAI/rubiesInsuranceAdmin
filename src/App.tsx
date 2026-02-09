@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Customers from './components/Customers';
@@ -10,18 +11,22 @@ import Settings from './components/Settings';
 import Notifications from './components/Notifications';
 import Login from './components/Login';
 import { Search, Bell, X, CheckCheck, Plus, UserPlus, FilePlus, Zap, PieChart } from 'lucide-react';
+import { useAppSelector, persistor } from '@/store';
+import { auth } from '@/store/module/auth';
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const dispatch = useDispatch();
+  const isAuthenticated = useAppSelector(state => !!state.auth.token);
+  const loginDetails = useAppSelector(state => state.auth.loginDetails);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const quickActionsRef = useRef<HTMLDivElement>(null);
 
-  const handleLogin = () => setIsAuthenticated(true);
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    dispatch(auth.mutation.reset());
+    persistor.purge();
     setActiveTab('dashboard');
   };
 
@@ -57,7 +62,7 @@ const App: React.FC = () => {
   };
 
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
+    return <Login />;
   }
 
   const mockQuickNotifs = [
@@ -194,11 +199,15 @@ const App: React.FC = () => {
             
             <div className="flex items-center gap-3 pl-2">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-[#0D0D12] leading-tight tracking-tight">Sarah Jenkins</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Admin</p>
+                <p className="text-sm font-bold text-[#0D0D12] leading-tight tracking-tight">
+                  {loginDetails?.userFirstName || ''} {loginDetails?.userLastName || ''}
+                </p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  {loginDetails?.userType || 'Admin'}
+                </p>
               </div>
               <div className="w-10 h-10 bg-[#0D0D12] rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-slate-200">
-                SJ
+                {(loginDetails?.userFirstName?.[0] || '')}{(loginDetails?.userLastName?.[0] || '')}
               </div>
             </div>
           </div>

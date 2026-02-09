@@ -29,7 +29,7 @@ const Customers: React.FC = () => {
             />
           </div>
           <button 
-            onClick={() => exportToCSV(mockCustomers, 'insureflow_customers')}
+            onClick={() => exportToCSV(mockCustomers, 'rubies_insure_customers')}
             className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm"
           >
             <Download className="w-4 h-4" />
