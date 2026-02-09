@@ -9,6 +9,10 @@
   "basePath": "/",
   "tags": [
     {
+      "name": "admin-controller",
+      "description": "Admin Controller"
+    },
+    {
       "name": "authentication-controller",
       "description": "Authentication Controller"
     },
@@ -58,6 +62,522 @@
             "schema": {
               "$ref": "#/definitions/BaseResponse"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/claims": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getClaims",
+        "operationId": "getClaimsUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "endDate",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page",
+            "required": false,
+            "type": "string",
+            "default": "1"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "search",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "size",
+            "required": false,
+            "type": "string",
+            "default": "10"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "startDate",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetClaimsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/claims/{claimId}": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getClaim",
+        "operationId": "getClaimUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetClaimResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/customers": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getUsers",
+        "operationId": "getUsersUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "endDate",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page",
+            "required": false,
+            "type": "string",
+            "default": "1"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "search",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "size",
+            "required": false,
+            "type": "string",
+            "default": "10"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "startDate",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetUsersResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/customers/{customerId}": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getUser",
+        "operationId": "getUserUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "customerId",
+            "in": "path",
+            "description": "customerId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetUserResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/dashboard": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "dashboard",
+        "operationId": "dashboardUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AdminDashboardResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/invite": {
+      "post": {
+        "tags": ["admin-controller"],
+        "summary": "inviteAdmin",
+        "operationId": "inviteAdminUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminInviteRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/subscriptions": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getSubscriptions",
+        "operationId": "getSubscriptionsUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "endDate",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page",
+            "required": false,
+            "type": "string",
+            "default": "1"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "search",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "size",
+            "required": false,
+            "type": "string",
+            "default": "10"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "startDate",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetSubscriptionsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/subscriptions/{subscriptionId}": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getSubscription",
+        "operationId": "getSubscriptionUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "description": "subscriptionId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetSubscriptionResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/authentication/admin/login": {
+      "post": {
+        "tags": ["authentication-controller"],
+        "summary": "adminLogin",
+        "operationId": "adminLoginUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdminLoginRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
@@ -1300,6 +1820,95 @@
       },
       "title": "AddPaymentAccountRequest"
     },
+    "AdminDashboardResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/AdminDashboardResponseData"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "AdminDashboardResponse"
+    },
+    "AdminDashboardResponseData": {
+      "type": "object",
+      "required": [
+        "activePlanCount",
+        "activePolicies",
+        "claimCount",
+        "coverage"
+      ],
+      "properties": {
+        "activePlanCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "activePolicies": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "claimCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "coverage": {
+          "$ref": "#/definitions/CoverageData"
+        }
+      },
+      "title": "AdminDashboardResponseData"
+    },
+    "AdminInviteRequest": {
+      "type": "object",
+      "required": [
+        "adminEmail",
+        "adminFirstName",
+        "adminLastName",
+        "adminPhoneNumber"
+      ],
+      "properties": {
+        "adminEmail": {
+          "type": "string"
+        },
+        "adminFirstName": {
+          "type": "string"
+        },
+        "adminLastName": {
+          "type": "string"
+        },
+        "adminPhoneNumber": {
+          "type": "string"
+        }
+      },
+      "title": "AdminInviteRequest"
+    },
+    "AdminLoginRequest": {
+      "type": "object",
+      "required": ["email", "password"],
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "string"
+        },
+        "otp": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "title": "AdminLoginRequest"
+    },
     "BankListResponse": {
       "type": "object",
       "properties": {
@@ -1453,6 +2062,42 @@
       },
       "title": "CompletePasswordResetRequest"
     },
+    "CoverageData": {
+      "type": "object",
+      "required": [
+        "creditLifeCoverage",
+        "eduCareCoverage",
+        "shieldCoverage",
+        "tenantCoverage",
+        "totalCoverage",
+        "travelCoverage",
+        "vehicleCoverage"
+      ],
+      "properties": {
+        "creditLifeCoverage": {
+          "type": "number"
+        },
+        "eduCareCoverage": {
+          "type": "number"
+        },
+        "shieldCoverage": {
+          "type": "number"
+        },
+        "tenantCoverage": {
+          "type": "number"
+        },
+        "totalCoverage": {
+          "type": "number"
+        },
+        "travelCoverage": {
+          "type": "number"
+        },
+        "vehicleCoverage": {
+          "type": "number"
+        }
+      },
+      "title": "CoverageData"
+    },
     "DashboardDataCoverage": {
       "type": "object",
       "required": [
@@ -1533,6 +2178,123 @@
         }
       },
       "title": "DashboardResponseData"
+    },
+    "GetClaimResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Claim"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetClaimResponse"
+    },
+    "GetClaimsResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage", "totalSize"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Claim"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "totalSize": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "GetClaimsResponse"
+    },
+    "GetSubscriptionResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Subscription"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetSubscriptionResponse"
+    },
+    "GetSubscriptionsResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage", "totalSize"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Subscription"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "totalSize": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "GetSubscriptionsResponse"
+    },
+    "GetUserResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/User"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetUserResponse"
+    },
+    "GetUsersResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage", "totalSize"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "totalSize": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "GetUsersResponse"
     },
     "InitiateEnrollmentRequest": {
       "type": "object",
@@ -1845,6 +2607,92 @@
         }
       },
       "title": "TravelDetailsResponse"
+    },
+    "User": {
+      "type": "object",
+      "required": [
+        "nextOfKinVerified",
+        "ninVerified",
+        "userDetailsProvided",
+        "userId"
+      ],
+      "properties": {
+        "nextOfKinVerified": {
+          "type": "boolean"
+        },
+        "ninVerified": {
+          "type": "boolean"
+        },
+        "userAddress": {
+          "type": "string"
+        },
+        "userCode": {
+          "type": "string"
+        },
+        "userCreatedAt": {
+          "type": "string"
+        },
+        "userDateOfBirth": {
+          "type": "string"
+        },
+        "userDetailsProvided": {
+          "type": "boolean"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "userFirstName": {
+          "type": "string"
+        },
+        "userGender": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "userLastName": {
+          "type": "string"
+        },
+        "userNextOfKinAddress": {
+          "type": "string"
+        },
+        "userNextOfKinEmail": {
+          "type": "string"
+        },
+        "userNextOfKinName": {
+          "type": "string"
+        },
+        "userNextOfKinNumber": {
+          "type": "string"
+        },
+        "userNin": {
+          "type": "string"
+        },
+        "userNumber": {
+          "type": "string"
+        },
+        "userOccupation": {
+          "type": "string"
+        },
+        "userPassword": {
+          "type": "string"
+        },
+        "userRoleId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "userStatus": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string"
+        },
+        "userUpdatedAt": {
+          "type": "string"
+        }
+      },
+      "title": "User"
     },
     "UserValidationRequest": {
       "type": "object",

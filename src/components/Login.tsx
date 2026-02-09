@@ -6,11 +6,11 @@ import { authServiceApi } from '@/service/api/AuthServiceApi';
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [login, { isLoading }] = authServiceApi.useLoginMutation();
+  const [adminLogin, { isLoading }] = authServiceApi.useAdminLoginMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login({ userEmail: email, userPassword: password });
+    await adminLogin({ email, password });
   };
 
   return (

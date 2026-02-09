@@ -77,6 +77,21 @@ export interface CompletePasswordResetRequest {
   otp?: string;
 }
 
+export interface AdminLoginRequest {
+  email: string;
+  password: string;
+  otp?: string;
+  latitude?: string;
+  longitude?: string;
+}
+
+export interface AdminInviteRequest {
+  adminEmail: string;
+  adminFirstName: string;
+  adminLastName: string;
+  adminPhoneNumber: string;
+}
+
 // ============================================================
 // Dashboard
 // ============================================================
@@ -101,6 +116,19 @@ export interface DashboardResponse extends BaseResponse {
   data: DashboardResponseData;
 }
 
+export type CoverageData = DashboardDataCoverage;
+
+export interface AdminDashboardResponseData {
+  activePlanCount: number;
+  claimCount: number;
+  activePolicies: number;
+  coverage: CoverageData;
+}
+
+export interface AdminDashboardResponse extends BaseResponse {
+  data: AdminDashboardResponseData;
+}
+
 // ============================================================
 // Claims
 // ============================================================
@@ -117,6 +145,15 @@ export interface ApiClaim {
 
 export interface ClaimReadListResponse extends BaseResponse {
   data: ApiClaim[];
+}
+
+export interface GetClaimsResponse extends BaseResponse {
+  data: ApiClaim[];
+  totalSize: number;
+}
+
+export interface GetClaimResponse extends BaseResponse {
+  data: ApiClaim;
 }
 
 // ============================================================
@@ -145,6 +182,15 @@ export interface ApiSubscription {
 
 export interface SubscriptionReadListResponse extends BaseResponse {
   data: ApiSubscription[];
+}
+
+export interface GetSubscriptionsResponse extends BaseResponse {
+  data: ApiSubscription[];
+  totalSize: number;
+}
+
+export interface GetSubscriptionResponse extends BaseResponse {
+  data: ApiSubscription;
 }
 
 // ============================================================
@@ -254,4 +300,53 @@ export interface TravelDetails {
 
 export interface TravelDetailsResponse extends BaseResponse {
   data: TravelDetails;
+}
+
+// ============================================================
+// Admin Shared
+// ============================================================
+export interface AdminListParams {
+  page?: string;
+  size?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+// ============================================================
+// Customers (Admin)
+// ============================================================
+export interface ApiUser {
+  userId: number;
+  userCode?: string;
+  userEmail?: string;
+  userFirstName?: string;
+  userLastName?: string;
+  userNumber?: string;
+  userGender?: string;
+  userAddress?: string;
+  userDateOfBirth?: string;
+  userOccupation?: string;
+  userStatus?: string;
+  userType?: string;
+  userRoleId?: number;
+  userNin?: string;
+  userCreatedAt?: string;
+  userUpdatedAt?: string;
+  userDetailsProvided: boolean;
+  ninVerified: boolean;
+  nextOfKinVerified: boolean;
+  userNextOfKinName?: string;
+  userNextOfKinNumber?: string;
+  userNextOfKinEmail?: string;
+  userNextOfKinAddress?: string;
+}
+
+export interface GetUsersResponse extends BaseResponse {
+  data: ApiUser[];
+  totalSize: number;
+}
+
+export interface GetUserResponse extends BaseResponse {
+  data: ApiUser;
 }

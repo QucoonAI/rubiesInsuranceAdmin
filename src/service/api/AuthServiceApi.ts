@@ -3,6 +3,8 @@ import { RTKTagsConstant } from "@/utils/constant/RTKTagsConstant";
 import {
     LoginRequest,
     LoginResponse,
+    AdminLoginRequest,
+    AdminInviteRequest,
     ChangePasswordRequest,
     InitiateEnrollmentRequest,
     CompleteEnrollmentRequest,
@@ -18,6 +20,20 @@ const api = createBaseApi("api/auth-service", authTag).injectEndpoints({
         login: build.mutation<LoginResponse, LoginRequest>({
             query: (arg: LoginRequest) => ({
                 url: "authentication/login",
+                method: "POST",
+                body: arg,
+            }),
+        }),
+        adminLogin: build.mutation<LoginResponse, AdminLoginRequest>({
+            query: (arg: AdminLoginRequest) => ({
+                url: "authentication/admin/login",
+                method: "POST",
+                body: arg,
+            }),
+        }),
+        inviteAdmin: build.mutation<BaseResponse, AdminInviteRequest>({
+            query: (arg: AdminInviteRequest) => ({
+                url: "admin/invite",
                 method: "POST",
                 body: arg,
             }),

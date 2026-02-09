@@ -10,8 +10,14 @@ import { claimServiceApi } from '@/service/api/ClaimServiceApi';
 import { ApiClaim } from '@/types/api';
 
 const Claims: React.FC = () => {
-  const { data, isLoading, isError, refetch } = claimServiceApi.useGetClaimsQuery();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const { data, isLoading, isError, refetch } = claimServiceApi.useGetClaimsQuery({
+    page: page.toString(),
+    size: pageSize.toString(),
+  });
   const claims = data?.data ?? [];
+  const totalSize = data?.totalSize ?? 0;
 
   const [selectedClaim, setSelectedClaim] = useState<ApiClaim | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
@@ -145,6 +151,28 @@ const Claims: React.FC = () => {
             )}
           </tbody>
         </table>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            {totalSize} total claims
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-30"
+            >
+              Previous
+            </button>
+            <span className="px-3 py-1.5 text-xs font-bold text-[#0D0D12]">Page {page}</span>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={claims.length < pageSize}
+              className="px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-30"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Claims Processing Modal */}

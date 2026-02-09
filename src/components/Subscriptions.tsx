@@ -6,8 +6,14 @@ import { subscriptionServiceApi } from '@/service/api/SubscriptionServiceApi';
 import { ApiSubscription } from '@/types/api';
 
 const Subscriptions: React.FC = () => {
-  const { data, isLoading, isError, refetch } = subscriptionServiceApi.useGetSubscriptionsQuery();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const { data, isLoading, isError, refetch } = subscriptionServiceApi.useGetSubscriptionsQuery({
+    page: page.toString(),
+    size: pageSize.toString(),
+  });
   const subscriptions = data?.data ?? [];
+  const totalSize = data?.totalSize ?? 0;
 
   const [viewingCert, setViewingCert] = useState<ApiSubscription | null>(null);
 
@@ -95,6 +101,28 @@ const Subscriptions: React.FC = () => {
             )}
           </tbody>
         </table>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            {totalSize} total subscriptions
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-30"
+            >
+              Previous
+            </button>
+            <span className="px-3 py-1.5 text-xs font-bold text-[#0D0D12]">Page {page}</span>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={subscriptions.length < pageSize}
+              className="px-3 py-1.5 text-xs font-bold border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-30"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Certificate Modal */}

@@ -35,6 +35,13 @@ const slice = createSlice({
                     state.loginDetails = action.payload;
                     state.token = action.payload.token || "";
                 }
+            )
+            .addMatcher(
+                authServiceApi.endpoints.adminLogin.matchFulfilled,
+                (state, action) => {
+                    state.loginDetails = action.payload;
+                    state.token = action.payload.token || "";
+                }
             );
     },
 });

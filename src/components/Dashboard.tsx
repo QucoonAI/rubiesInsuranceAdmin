@@ -1,19 +1,12 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
-import { ArrowUpRight, TrendingUp, Users, Shield, Clock, RefreshCw } from 'lucide-react';
+import { TrendingUp, Users, Shield, Clock, RefreshCw } from 'lucide-react';
 import { dashboardServiceApi } from '@/service/api/DashboardServiceApi';
 
-const mockPerformanceData = [
-  { name: 'Jan', revenue: 45000, claims: 12000 },
-  { name: 'Feb', revenue: 52000, claims: 15000 },
-  { name: 'Mar', revenue: 48000, claims: 11000 },
-  { name: 'Apr', revenue: 61000, claims: 18000 },
-  { name: 'May', revenue: 55000, claims: 14000 },
-  { name: 'Jun', revenue: 67000, claims: 16000 },
-];
+const COVERAGE_COLORS = ['#0D0D12', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ef4444'];
 
 const Dashboard: React.FC = () => {
   const { data, isLoading, isError, isFetching, refetch } = dashboardServiceApi.useGetDashboardQuery();
@@ -25,8 +18,21 @@ const Dashboard: React.FC = () => {
     { label: 'Active Plans', val: dashboardData?.activePlanCount?.toLocaleString() ?? '—', icon: Users, color: 'text-[#0D0D12]', bg: 'bg-[#0D0D12]/5' },
     { label: 'Total Coverage', val: totalCoverage ? `$${totalCoverage.toLocaleString()}` : '—', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { label: 'Claims', val: dashboardData?.claimCount?.toLocaleString() ?? '—', icon: Shield, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Active Policies', val: dashboardData?.activePolicies?.length?.toString() ?? '—', icon: Clock, color: 'text-rose-600', bg: 'bg-rose-50' },
+    { label: 'Active Policies', val: dashboardData?.activePolicies?.toLocaleString() ?? '—', icon: Clock, color: 'text-rose-600', bg: 'bg-rose-50' },
   ];
+
+  const coverageChartData = useMemo(() => {
+    const cov = dashboardData?.coverage;
+    if (!cov) return [];
+    return [
+      { name: 'Shield', value: cov.shieldCoverage },
+      { name: 'Travel', value: cov.travelCoverage },
+      { name: 'Vehicle', value: cov.vehicleCoverage },
+      { name: 'Credit Life', value: cov.creditLifeCoverage },
+      { name: 'EduCare', value: cov.eduCareCoverage },
+      { name: 'Tenant', value: cov.tenantCoverage },
+    ];
+  }, [dashboardData]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -71,37 +77,43 @@ const Dashboard: React.FC = () => {
 
       <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
         <div className="flex items-center justify-between mb-8">
-          <h3 className="text-xl font-bold text-[#0D0D12] tracking-tight">Performance Velocity</h3>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#0D0D12]"></div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Revenue</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Claims</span>
-            </div>
+          <h3 className="text-xl font-bold text-[#0D0D12] tracking-tight">Coverage Distribution</h3>
+          <div className="flex items-center gap-4 flex-wrap">
+            {coverageChartData.map((item, idx) => (
+              <div key={item.name} className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COVERAGE_COLORS[idx % COVERAGE_COLORS.length] }}></div>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{item.name}</span>
+              </div>
+            ))}
           </div>
         </div>
         <div className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={mockPerformanceData}>
-              <defs>
-                <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0D0D12" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#0D0D12" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} dx={-10} />
-              <Tooltip
-                contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.15)', padding: '16px'}}
-              />
-              <Area type="monotone" dataKey="revenue" stroke="#0D0D12" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
-              <Area type="monotone" dataKey="claims" stroke="#ef4444" strokeWidth={2} strokeDasharray="5 5" fill="transparent" />
-            </AreaChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-slate-200 border-t-[#0D0D12] rounded-full animate-spin"></div>
+            </div>
+          ) : coverageChartData.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-slate-400 text-sm font-medium">
+              No coverage data available
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={coverageChartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} dx={-10} />
+                <Tooltip
+                  contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.15)', padding: '16px'}}
+                  formatter={(value: number) => [`$${value.toLocaleString()}`, 'Coverage']}
+                />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={48}>
+                  {coverageChartData.map((_entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COVERAGE_COLORS[index % COVERAGE_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>
