@@ -2,11 +2,11 @@ import { BaseQueryApi, createApi, FetchArgs, fetchBaseQuery } from "@reduxjs/too
 import { ErrorResult, handleApiError } from "@/service/http/errorHandling";
 import { toast } from 'sonner';
 
-const stage = import.meta.env.VITE_API_STAGE || 'dev';
 
-export const baseUrl = import.meta.env.VITE_APP_ENV === 'dev'
-    ? `/api/api/${stage}`
-    : `${import.meta.env.VITE_BASE_URL}/api/${stage}`;
+export const baseUrl =
+  import.meta.env.VITE_APP_ENV === "dev"
+    ? import.meta.env.VITE_BASE_DEV_URL
+    : import.meta.env.VITE_BASE_PROD_URL;
 
 const baseQuery = fetchBaseQuery({
     baseUrl,
