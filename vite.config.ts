@@ -7,24 +7,24 @@ export default defineConfig(({ mode }) => {
     return {
       server: {
         port: 3000,
-        host: '0.0.0.0',
+        host: "0.0.0.0",
         proxy: {
-          '/api': {
-            target: env.VITE_BASE_URL || 'https://ohtmdjkekh.execute-api.us-east-1.amazonaws.com',
+          "/api": {
+            target: env.VITE_BASE_DEV_URL,
             changeOrigin: true,
-            rewrite: (path: string) => path.replace(/^\/api/, ''),
+            rewrite: (path: string) => path.replace(/^\/api/, ""),
           },
         },
       },
       plugins: [react()],
       define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        "process.env.API_KEY": JSON.stringify(env.GEMINI_API_KEY),
+        "process.env.GEMINI_API_KEY": JSON.stringify(env.GEMINI_API_KEY),
       },
       resolve: {
         alias: {
-          '@': path.resolve(__dirname, './src'),
-        }
-      }
+          "@": path.resolve(__dirname, "./src"),
+        },
+      },
     };
 });
