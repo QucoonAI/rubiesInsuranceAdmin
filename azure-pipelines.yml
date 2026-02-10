@@ -25,6 +25,15 @@ steps:
     globExpressions: '**'
     filesAcl: 'authenticated-read'
     createBucket: true
+    
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'RubiesAwsConnection'
+    regionName: 'us-east-1'
+    awsCommand: 'cloudfront'
+    awsSubCommand: 'create-invalidation'
+    awsArguments: '--distribution-id E10UEF1IN53GP4 --paths "/*"'
+  displayName: 'Invalidate CloudFront Cache'
 # Build a Node.js project that uses Vue.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
