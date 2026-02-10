@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Download, UserPlus, ChevronRight, RefreshCw, X, Send, Mail, Bell, Phone, MapPin, Shield, Calendar } from 'lucide-react';
+import { Search, Download, UserPlus, ChevronRight, RefreshCw, X, Send, Mail, Phone, MapPin, Shield } from 'lucide-react';
 import { exportToCSV } from '../utils/csvExport';
 import { customerServiceApi } from '@/service/api/CustomerServiceApi';
 import { ApiUser } from '@/types/api';
@@ -118,13 +118,6 @@ const Customers: React.FC = () => {
           >
             <Download className="w-4 h-4" />
             Export
-          </button>
-          <button
-            onClick={() => setShowNotification(true)}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm"
-          >
-            <Bell className="w-4 h-4" />
-            Notify
           </button>
           <button
             onClick={() => setShowNewClient(true)}
