@@ -1,6 +1,6 @@
 import { createApiProxy, createBaseApi } from "@/service/api/BaseServiceApi";
 import { RTKTagsConstant } from "@/utils/constant/RTKTagsConstant";
-import { GetClaimsResponse, GetClaimResponse, BaseResponse, AdminListParams } from "@/types/api";
+import { GetClaimsResponse, GetClaimResponse, GetClaimDocumentsResponse, GetClaimDocumentResponse, ClaimToggleRequest, BaseResponse, AdminListParams } from "@/types/api";
 
 const claimTag = Object.values(RTKTagsConstant.CLAIM_TAGS);
 
@@ -37,6 +37,27 @@ const api = createBaseApi("api/claim-service", claimTag).injectEndpoints({
                 method: "POST",
             }),
             invalidatesTags: [RTKTagsConstant.CLAIM_TAGS.LIST],
+        }),
+        getClaimDocuments: build.query<GetClaimDocumentsResponse, number>({
+            query: (claimId) => ({
+                url: `admin/claims/${claimId}/documents`,
+                method: "GET",
+            }),
+            providesTags: [RTKTagsConstant.CLAIM_TAGS.DETAIL],
+        }),
+        getClaimDocumentUrl: build.query<GetClaimDocumentResponse, { claimId: number; documentId: number }>({
+            query: ({ claimId, documentId }) => ({
+                url: `admin/claims/${claimId}/documents/${documentId}`,
+                method: "GET",
+            }),
+        }),
+        toggleClaimStatus: build.mutation<BaseResponse, { claimId: number } & ClaimToggleRequest>({
+            query: ({ claimId, ...body }) => ({
+                url: `admin/claims/${claimId}/toggle`,
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: [RTKTagsConstant.CLAIM_TAGS.LIST, RTKTagsConstant.CLAIM_TAGS.DETAIL],
         }),
     }),
     overrideExisting: false,

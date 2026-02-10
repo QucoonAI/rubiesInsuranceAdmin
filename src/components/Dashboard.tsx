@@ -16,7 +16,7 @@ const Dashboard: React.FC = () => {
 
   const kpis = [
     { label: 'Active Plans', val: dashboardData?.activePlanCount?.toLocaleString() ?? '—', icon: Users, color: 'text-[#0D0D12]', bg: 'bg-[#0D0D12]/5' },
-    { label: 'Total Coverage', val: totalCoverage ? `$${totalCoverage.toLocaleString()}` : '—', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Total Coverage', val: totalCoverage ? `₦${totalCoverage.toLocaleString()}` : '—', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { label: 'Claims', val: dashboardData?.claimCount?.toLocaleString() ?? '—', icon: Shield, color: 'text-amber-600', bg: 'bg-amber-50' },
     { label: 'Active Policies', val: dashboardData?.activePolicies?.toLocaleString() ?? '—', icon: Clock, color: 'text-rose-600', bg: 'bg-rose-50' },
   ];
@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} dx={-10} />
                 <Tooltip
                   contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.15)', padding: '16px'}}
-                  formatter={(value: number) => [`$${value.toLocaleString()}`, 'Coverage']}
+                  formatter={(value: number) => [`₦${value.toLocaleString()}`, 'Coverage']}
                 />
                 <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={48}>
                   {coverageChartData.map((_entry, index) => (

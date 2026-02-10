@@ -202,6 +202,174 @@
         }
       }
     },
+    "/api/{stage}/admin/claims/{claimId}/documents": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getClaimDocuments",
+        "operationId": "getClaimDocumentsUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetClaimDocumentsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/claims/{claimId}/documents/{documentId}": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getClaimDocumentUrl",
+        "operationId": "getClaimDocumentUrlUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "documentId",
+            "in": "path",
+            "description": "documentId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetClaimDocumentResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/claims/{claimId}/toggle": {
+      "post": {
+        "tags": ["admin-controller"],
+        "summary": "toggleClaimStatus",
+        "operationId": "toggleClaimStatusUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "claimId",
+            "in": "path",
+            "description": "claimId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ClaimToggleRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/{stage}/admin/customers": {
       "get": {
         "tags": ["admin-controller"],
@@ -385,6 +553,60 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/AdminInviteRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/notify": {
+      "post": {
+        "tags": ["admin-controller"],
+        "summary": "notify",
+        "operationId": "notifyUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotifyRequest"
             }
           },
           {
@@ -998,7 +1220,7 @@
         "tags": ["claim-controller"],
         "summary": "create",
         "operationId": "createUsingPOST",
-        "consumes": ["application/json"],
+        "consumes": ["multipart/form-data"],
         "produces": ["*/*"],
         "parameters": [
           {
@@ -1009,10 +1231,19 @@
             "type": "string"
           },
           {
+            "name": "files",
+            "in": "formData",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "file"
+            },
+            "collectionFormat": "multi"
+          },
+          {
             "name": "subscriptionId",
-            "in": "query",
-            "description": "subscriptionId",
-            "required": true,
+            "in": "formData",
+            "required": false,
             "type": "integer",
             "format": "int32"
           }
@@ -1236,10 +1467,11 @@
       }
     },
     "/api/{stage}/payment/account/enquiry": {
-      "get": {
+      "post": {
         "tags": ["payment-controller"],
         "summary": "nameEnquiry",
-        "operationId": "nameEnquiryUsingGET",
+        "operationId": "nameEnquiryUsingPOST",
+        "consumes": ["application/json"],
         "produces": ["*/*"],
         "parameters": [
           {
@@ -1258,6 +1490,9 @@
             "schema": {
               "$ref": "#/definitions/AccountNameEnquiryResponse"
             }
+          },
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
@@ -1472,6 +1707,61 @@
         }
       }
     },
+    "/api/{stage}/policy/premium": {
+      "get": {
+        "tags": ["policy-controller"],
+        "summary": "getFinalAmount",
+        "operationId": "getFinalAmountUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "query",
+            "description": "amount",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "selected",
+            "in": "query",
+            "description": "selected",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/FinalAmountResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/{stage}/policy/travel/details": {
       "get": {
         "tags": ["policy-controller"],
@@ -1490,14 +1780,14 @@
             "name": "destination",
             "in": "query",
             "description": "destination",
-            "required": false,
+            "required": true,
             "type": "string"
           },
           {
             "name": "origin",
             "in": "query",
             "description": "origin",
-            "required": false,
+            "required": true,
             "type": "string"
           },
           {
@@ -2013,6 +2303,33 @@
       },
       "title": "Claim"
     },
+    "ClaimDocument": {
+      "type": "object",
+      "properties": {
+        "claimId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "documentS3Key": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "ClaimDocument"
+    },
     "ClaimReadListResponse": {
       "type": "object",
       "required": ["data", "responseCode", "responseMessage"],
@@ -2031,6 +2348,29 @@
         }
       },
       "title": "ClaimReadListResponse"
+    },
+    "ClaimToggleRequest": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "pattern": "^(APPROVED|REJECTED|SETTLED)$"
+        },
+        "recipientAccountName": {
+          "type": "string"
+        },
+        "recipientAccountNumber": {
+          "type": "string"
+        },
+        "recipientBankCode": {
+          "type": "string"
+        },
+        "recipientBankName": {
+          "type": "string"
+        }
+      },
+      "title": "ClaimToggleRequest"
     },
     "CompleteEnrollmentRequest": {
       "type": "object",
@@ -2098,42 +2438,6 @@
       },
       "title": "CoverageData"
     },
-    "DashboardDataCoverage": {
-      "type": "object",
-      "required": [
-        "creditLifeCoverage",
-        "eduCareCoverage",
-        "shieldCoverage",
-        "tenantCoverage",
-        "totalCoverage",
-        "travelCoverage",
-        "vehicleCoverage"
-      ],
-      "properties": {
-        "creditLifeCoverage": {
-          "type": "number"
-        },
-        "eduCareCoverage": {
-          "type": "number"
-        },
-        "shieldCoverage": {
-          "type": "number"
-        },
-        "tenantCoverage": {
-          "type": "number"
-        },
-        "totalCoverage": {
-          "type": "number"
-        },
-        "travelCoverage": {
-          "type": "number"
-        },
-        "vehicleCoverage": {
-          "type": "number"
-        }
-      },
-      "title": "DashboardDataCoverage"
-    },
     "DashboardResponse": {
       "type": "object",
       "required": ["data", "responseCode", "responseMessage"],
@@ -2174,10 +2478,61 @@
           "format": "int32"
         },
         "coverage": {
-          "$ref": "#/definitions/DashboardDataCoverage"
+          "$ref": "#/definitions/CoverageData"
         }
       },
       "title": "DashboardResponseData"
+    },
+    "FinalAmountResponse": {
+      "type": "object",
+      "required": ["amount", "responseCode", "responseMessage"],
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "FinalAmountResponse"
+    },
+    "GetClaimDocumentResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "string"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetClaimDocumentResponse"
+    },
+    "GetClaimDocumentsResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClaimDocument"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetClaimDocumentsResponse"
     },
     "GetClaimResponse": {
       "type": "object",
@@ -2197,19 +2552,44 @@
     },
     "GetClaimsResponse": {
       "type": "object",
-      "required": ["data", "responseCode", "responseMessage", "totalSize"],
+      "required": [
+        "approvedCount",
+        "data",
+        "pendingCount",
+        "rejectedCount",
+        "responseCode",
+        "responseMessage",
+        "settledCount",
+        "totalSize"
+      ],
       "properties": {
+        "approvedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
         "data": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Claim"
           }
         },
+        "pendingCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rejectedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
         "responseCode": {
           "type": "string"
         },
         "responseMessage": {
           "type": "string"
+        },
+        "settledCount": {
+          "type": "integer",
+          "format": "int32"
         },
         "totalSize": {
           "type": "integer",
@@ -2442,6 +2822,22 @@
       },
       "title": "NinValidationRequest"
     },
+    "NotifyRequest": {
+      "type": "object",
+      "required": ["message", "subject"],
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        }
+      },
+      "title": "NotifyRequest"
+    },
     "PaymentAccount": {
       "type": "object",
       "required": ["accountNumber", "isPrimary", "status", "userId"],
@@ -2538,6 +2934,9 @@
           "format": "int32"
         },
         "subscriptionPolicyName": {
+          "type": "string"
+        },
+        "subscriptionPremiums": {
           "type": "string"
         },
         "subscriptionStatus": {
