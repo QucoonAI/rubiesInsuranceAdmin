@@ -1,0 +1,31 @@
+trigger:
+- develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    yarn install
+    yarn build
+  displayName: 'yarn install and build'
+
+
+- task: S3Upload@1
+  inputs:
+    awsCredentials: 'RubiesAwsConnection'
+    regionName: 'us-east-1'
+    bucketName: 'insurance-admin.rubies.ng'
+    sourceFolder: 'dist'
+    globExpressions: '**'
+    filesAcl: 'authenticated-read'
+    createBucket: true
+# Build a Node.js project that uses Vue.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+# Node.js with Vue
