@@ -1,15 +1,12 @@
 
 import React, { useState } from 'react';
-import { Search, Download, UserPlus, ChevronRight, RefreshCw, X, Send, Mail, Bell, Phone, MapPin, Shield, Calendar } from 'lucide-react';
+import { Search, Download, UserPlus, ChevronRight, RefreshCw, X, Send, Mail, Phone, MapPin, Shield } from 'lucide-react';
 import { exportToCSV } from '../utils/csvExport';
 import { customerServiceApi } from '@/service/api/CustomerServiceApi';
 import { ApiUser } from '@/types/api';
 import { toast } from 'sonner';
 
 const notificationTemplates = [
-  { id: 'renewal', label: 'Renewal Reminder', subject: 'Your Policy Renewal is Due', body: 'Dear {name}, your policy is due for renewal on {date}. Please ensure timely payment to maintain your coverage.' },
-  { id: 'premium', label: 'Premium Due', subject: 'Premium Payment Reminder', body: 'Dear {name}, your premium payment of {amount} is due. Please make payment to avoid policy lapse.' },
-  { id: 'maturity', label: 'Policy Maturity', subject: 'Policy Maturity Notice', body: 'Dear {name}, congratulations! Your savings plan has reached maturity. Please contact us to process your benefits.' },
   { id: 'general', label: 'General Notice', subject: '', body: '' },
 ];
 
@@ -26,6 +23,8 @@ const Customers: React.FC = () => {
   });
   const customers = data?.data ?? [];
   const totalSize = data?.totalSize ?? 0;
+
+  const [sendNotification, { isLoading: isSending }] = customerServiceApi.useSendNotificationMutation();
 
   // Customer detail drawer
   const [selectedCustomer, setSelectedCustomer] = useState<ApiUser | null>(null);
@@ -57,17 +56,26 @@ const Customers: React.FC = () => {
     }
   };
 
-  const handleSendNotification = () => {
+  const handleSendNotification = async () => {
     if (!notifSubject.trim() || !notifBody.trim()) {
       toast.error('Please fill in subject and message');
       return;
     }
-    const target = notifRecipient === 'all' ? 'all customers' : (notifCustomer?.userEmail || 'selected customer');
-    toast.success(`Notification sent to ${target}`);
-    setShowNotification(false);
-    setNotifSubject('');
-    setNotifBody('');
-    setNotifCustomer(null);
+    try {
+      await sendNotification({
+        subject: notifSubject,
+        message: notifBody,
+        ...(notifRecipient === 'single' && notifCustomer ? { userId: notifCustomer.userId.toString() } : {}),
+      }).unwrap();
+      const target = notifRecipient === 'all' ? 'all customers' : (notifCustomer?.userEmail || 'selected customer');
+      toast.success(`Notification sent to ${target}`);
+      setShowNotification(false);
+      setNotifSubject('');
+      setNotifBody('');
+      setNotifCustomer(null);
+    } catch {
+      toast.error('Failed to send notification');
+    }
   };
 
   const handleCreateClient = () => {
@@ -110,13 +118,6 @@ const Customers: React.FC = () => {
           >
             <Download className="w-4 h-4" />
             Export
-          </button>
-          <button
-            onClick={() => setShowNotification(true)}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm"
-          >
-            <Bell className="w-4 h-4" />
-            Notify
           </button>
           <button
             onClick={() => setShowNewClient(true)}
@@ -477,10 +478,11 @@ const Customers: React.FC = () => {
               </button>
               <button
                 onClick={handleSendNotification}
-                className="px-6 py-3 bg-[#0D0D12] text-white rounded-2xl font-bold hover:bg-black shadow-lg shadow-slate-200 transition-all text-sm flex items-center gap-2"
+                disabled={isSending}
+                className="px-6 py-3 bg-[#0D0D12] text-white rounded-2xl font-bold hover:bg-black shadow-lg shadow-slate-200 transition-all text-sm flex items-center gap-2 disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
-                Send Notification
+                {isSending ? 'Sending...' : 'Send Notification'}
               </button>
             </div>
           </div>

@@ -68,8 +68,8 @@ const Subscriptions: React.FC = () => {
               <div><div class="label">Policy Name</div><div class="value">${viewingCert?.subscriptionPolicyName || '—'}</div></div>
               <div><div class="label">Status</div><div class="value">${viewingCert?.subscriptionStatus || '—'}</div></div>
               <div><div class="label">Effective Term</div><div class="value">${viewingCert?.subscriptionStartDate || '—'} — ${viewingCert?.subscriptionEndDate || '—'}</div></div>
-              <div><div class="label">Payment Amount</div><div class="value">$${viewingCert?.subscriptionPaymentAmount ?? 0}</div></div>
-              <div><div class="label">Assured Sum</div><div class="value">$${(viewingCert?.subscriptionAssuredSum ?? 0).toLocaleString()}</div></div>
+              <div><div class="label">Payment Amount</div><div class="value">₦${viewingCert?.subscriptionPaymentAmount ?? 0}</div></div>
+              <div><div class="label">Assured Sum</div><div class="value">₦${(viewingCert?.subscriptionAssuredSum ?? 0).toLocaleString()}</div></div>
               <div><div class="label">Frequency</div><div class="value">${viewingCert?.subscriptionContributionFrequency || '—'}</div></div>
             </div>
             <div class="footer">Issued by Rubies Insure Corporate Security. This electronic record is cryptographically signed and legally binding.</div>
@@ -164,7 +164,7 @@ const Subscriptions: React.FC = () => {
                       {sub.subscriptionStatus || '—'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-black text-[#0D0D12]">${sub.subscriptionPaymentAmount ?? 0}</td>
+                  <td className="px-6 py-4 text-sm font-black text-[#0D0D12]">₦{sub.subscriptionPaymentAmount ?? 0}</td>
                   <td className="px-6 py-4 text-right">
                     <button
                       onClick={() => setViewingCert(sub)}
@@ -261,7 +261,7 @@ const Subscriptions: React.FC = () => {
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Policies</div>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <div className="text-2xl font-black text-[#0D0D12]">${reportSummary.totalPremium.toLocaleString()}</div>
+                  <div className="text-2xl font-black text-[#0D0D12]">₦{reportSummary.totalPremium.toLocaleString()}</div>
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Premium</div>
                 </div>
                 <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
@@ -296,7 +296,7 @@ const Subscriptions: React.FC = () => {
                         <tr key={sub.subscriptionId} className="hover:bg-slate-50/50">
                           <td className="px-4 py-3 font-mono text-xs font-bold text-slate-500">SUB-{sub.subscriptionId}</td>
                           <td className="px-4 py-3 text-sm font-bold text-[#0D0D12]">{sub.subscriptionPolicyName || '—'}</td>
-                          <td className="px-4 py-3 text-sm font-black text-[#0D0D12]">${sub.subscriptionPaymentAmount ?? 0}</td>
+                          <td className="px-4 py-3 text-sm font-black text-[#0D0D12]">₦{sub.subscriptionPaymentAmount ?? 0}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest ${
                               sub.subscriptionStatus === 'Active' ? 'bg-emerald-50 text-emerald-700' :
@@ -379,11 +379,11 @@ const Subscriptions: React.FC = () => {
                 </div>
                 <div>
                   <label className="text-[9px] uppercase text-slate-300 font-black mb-1 block tracking-widest">Payment Amount</label>
-                  <p className="text-[#0D0D12] font-black text-lg">${viewingCert.subscriptionPaymentAmount ?? 0}</p>
+                  <p className="text-[#0D0D12] font-black text-lg">₦{viewingCert.subscriptionPaymentAmount ?? 0}</p>
                 </div>
                 <div>
                   <label className="text-[9px] uppercase text-slate-300 font-black mb-1 block tracking-widest">Assured Sum</label>
-                  <p className="font-bold text-slate-600">${(viewingCert.subscriptionAssuredSum ?? 0).toLocaleString()}</p>
+                  <p className="font-bold text-slate-600">₦{(viewingCert.subscriptionAssuredSum ?? 0).toLocaleString()}</p>
                 </div>
                 <div>
                   <label className="text-[9px] uppercase text-slate-300 font-black mb-1 block tracking-widest">Frequency</label>

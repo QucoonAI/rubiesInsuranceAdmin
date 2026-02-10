@@ -150,6 +150,35 @@ export interface ClaimReadListResponse extends BaseResponse {
 export interface GetClaimsResponse extends BaseResponse {
   data: ApiClaim[];
   totalSize: number;
+  approvedCount: number;
+  pendingCount: number;
+  rejectedCount: number;
+  settledCount: number;
+}
+
+export interface ClaimToggleRequest {
+  action: 'APPROVED' | 'REJECTED' | 'SETTLED';
+  recipientAccountName?: string;
+  recipientAccountNumber?: string;
+  recipientBankCode?: string;
+  recipientBankName?: string;
+}
+
+export interface ClaimDocument {
+  id: number;
+  claimId: number;
+  userId: number;
+  documentS3Key: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface GetClaimDocumentsResponse extends BaseResponse {
+  data: ClaimDocument[];
+}
+
+export interface GetClaimDocumentResponse extends BaseResponse {
+  data: string;
 }
 
 export interface GetClaimResponse extends BaseResponse {
@@ -174,6 +203,7 @@ export interface ApiSubscription {
   subscriptionCreatedAt?: string;
   subscriptionUpdatedAt?: string;
   subscriptionExtraData?: string;
+  subscriptionPremiums?: string;
   subscriptionToBeRenewed: boolean;
   nextPaymentDate?: string;
   daysBetweenPayments?: number;
@@ -300,6 +330,15 @@ export interface TravelDetails {
 
 export interface TravelDetailsResponse extends BaseResponse {
   data: TravelDetails;
+}
+
+// ============================================================
+// Admin Notifications
+// ============================================================
+export interface NotifyRequest {
+  subject: string;
+  message: string;
+  userId?: string;
 }
 
 // ============================================================

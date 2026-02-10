@@ -1,6 +1,6 @@
 import { createApiProxy, createBaseApi } from "@/service/api/BaseServiceApi";
 import { RTKTagsConstant } from "@/utils/constant/RTKTagsConstant";
-import { GetUsersResponse, GetUserResponse, AdminListParams } from "@/types/api";
+import { GetUsersResponse, GetUserResponse, AdminListParams, NotifyRequest, BaseResponse } from "@/types/api";
 
 const customerTag = Object.values(RTKTagsConstant.CUSTOMER_TAGS);
 
@@ -30,6 +30,13 @@ const api = createBaseApi("api/customer-service", customerTag).injectEndpoints({
                 method: "GET",
             }),
             providesTags: [RTKTagsConstant.CUSTOMER_TAGS.DETAIL],
+        }),
+        sendNotification: build.mutation<BaseResponse, NotifyRequest>({
+            query: (body) => ({
+                url: "admin/notify",
+                method: "POST",
+                body,
+            }),
         }),
     }),
     overrideExisting: false,

@@ -5,12 +5,10 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Customers from './components/Customers';
 import Subscriptions from './components/Subscriptions';
-import Payments from './components/Payments';
 import Claims from './components/Claims';
 import Settings from './components/Settings';
-import Notifications from './components/Notifications';
 import Login from './components/Login';
-import { Search, Bell, X, CheckCheck, Plus, UserPlus, FilePlus, Zap, PieChart } from 'lucide-react';
+import { Search, Bell, X, CheckCheck, Plus, UserPlus, FilePlus, PieChart } from 'lucide-react';
 import { useAppSelector, persistor } from '@/store';
 import { auth } from '@/store/module/auth';
 
@@ -48,10 +46,8 @@ const App: React.FC = () => {
       case 'dashboard': return <Dashboard />;
       case 'customers': return <Customers />;
       case 'subscriptions': return <Subscriptions />;
-      case 'payments': return <Payments />;
       case 'claims': return <Claims />;
       case 'settings': return <Settings />;
-      case 'notifications': return <Notifications />;
       default: return <Dashboard />;
     }
   };
@@ -74,7 +70,6 @@ const App: React.FC = () => {
   const quickActions = [
     { id: 'new-claim', label: 'New Claim', icon: FilePlus, tab: 'claims', shortcut: 'C' },
     { id: 'add-customer', label: 'Add Customer', icon: UserPlus, tab: 'customers', shortcut: 'U' },
-    { id: 'reconcile', label: 'Reconcile Payment', icon: Zap, tab: 'payments', shortcut: 'R' },
     { id: 'report', label: 'Generate Report', icon: PieChart, tab: 'dashboard', shortcut: 'P' },
   ];
 
@@ -181,15 +176,6 @@ const App: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                    <button 
-                      onClick={() => {
-                        setActiveTab('notifications');
-                        setIsNotifOpen(false);
-                      }}
-                      className="w-full py-4 text-center text-sm font-bold text-[#0D0D12] bg-white hover:bg-slate-50 transition-colors border-t border-slate-100"
-                    >
-                      View all system notifications
-                    </button>
                   </div>
                 )}
               </div>
