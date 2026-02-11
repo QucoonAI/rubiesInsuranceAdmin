@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef } from 'react';
-import { Download, Eye, FileCheck, PieChart, X, Send, Mail, Calendar } from 'lucide-react';
+import { Download, Eye, FileCheck, PieChart, X, Send, Mail, Calendar, RefreshCw } from 'lucide-react';
 import { exportToCSV } from '../utils/csvExport';
 import { subscriptionServiceApi } from '@/service/api/SubscriptionServiceApi';
 import { ApiSubscription } from '@/types/api';
@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 const Subscriptions: React.FC = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  const { data, isLoading, isError, refetch } = subscriptionServiceApi.useGetSubscriptionsQuery({
+  const { data, isLoading, isError, isFetching, refetch } = subscriptionServiceApi.useGetSubscriptionsQuery({
     page: page.toString(),
     size: pageSize.toString(),
   });
@@ -113,6 +113,13 @@ const Subscriptions: React.FC = () => {
           >
             <PieChart className="w-4 h-4" />
             Performance
+          </button>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="p-2 border border-slate-200 bg-white text-slate-400 rounded-xl hover:bg-slate-50 hover:text-[#0D0D12] transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </header>
