@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import {
   FileSearch, MessageSquare, FileText,
   ArrowRight, ShieldAlert, Download, BrainCircuit, Send,
-  FileImage, Calendar, X, Eye, ChevronLeft, Loader2
+  FileImage, Calendar, X, Eye, ChevronLeft, Loader2, RefreshCw
 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import { exportToCSV } from '../utils/csvExport';
@@ -22,7 +22,7 @@ const mockMessages = [
 const Claims: React.FC = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  const { data, isLoading, isError, refetch } = claimServiceApi.useGetClaimsQuery({
+  const { data, isLoading, isError, isFetching, refetch } = claimServiceApi.useGetClaimsQuery({
     page: page.toString(),
     size: pageSize.toString(),
   });
@@ -209,6 +209,13 @@ const Claims: React.FC = () => {
           >
             <Calendar className="w-4 h-4" />
             Strategy Report
+          </button>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="p-2 border border-slate-200 bg-white text-slate-400 rounded-xl hover:bg-slate-50 hover:text-[#0D0D12] transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </header>
