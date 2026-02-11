@@ -67,6 +67,7 @@ const Claims: React.FC = () => {
 
   const pipelineCounts = useMemo(() => ({
     Pending: data?.pendingCount ?? 0,
+    Approved: data?.approvedCount ?? 0,
     Settled: data?.settledCount ?? 0,
     Rejected: data?.rejectedCount ?? 0,
   }), [data]);
@@ -228,9 +229,10 @@ const Claims: React.FC = () => {
       )}
 
       {/* Pipeline Visualization */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Pending', color: 'bg-[#0D0D12]' },
+          { label: 'Approved', color: 'bg-blue-500' },
           { label: 'Settled', color: 'bg-emerald-500' },
           { label: 'Rejected', color: 'bg-rose-500' },
         ].map((step, idx) => (
