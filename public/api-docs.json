@@ -21,6 +21,10 @@
       "description": "Claim Controller"
     },
     {
+      "name": "complaint-controller",
+      "description": "Complaint Controller"
+    },
+    {
       "name": "dashboard-controller",
       "description": "Dashboard Controller"
     },
@@ -338,6 +342,195 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/ClaimToggleRequest"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/complaints": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getComplaints",
+        "operationId": "getComplaintsUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "endDate",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page",
+            "required": false,
+            "type": "string",
+            "default": "1"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "search",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "size",
+            "required": false,
+            "type": "string",
+            "default": "10"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "startDate",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetComplaintsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/complaints/{complaintId}": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getComplaint",
+        "operationId": "getComplaintUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "complaintId",
+            "in": "path",
+            "description": "complaintId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetComplaintResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/complaints/{complaintId}/toggle": {
+      "post": {
+        "tags": ["admin-controller"],
+        "summary": "toggleComplaintStatus",
+        "operationId": "toggleComplaintStatusUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "complaintId",
+            "in": "path",
+            "description": "complaintId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ComplaintToggleRequest"
             }
           },
           {
@@ -722,6 +915,55 @@
         "tags": ["admin-controller"],
         "summary": "getSubscription",
         "operationId": "getSubscriptionUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "description": "subscriptionId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetSubscriptionResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/subscriptions/{subscriptionId}/cancellation": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "actOnSubscriptionCancellation",
+        "operationId": "actOnSubscriptionCancellationUsingGET",
         "produces": ["*/*"],
         "parameters": [
           {
@@ -1231,6 +1473,12 @@
             "type": "string"
           },
           {
+            "name": "narration",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "files",
             "in": "formData",
             "required": false,
@@ -1241,11 +1489,96 @@
             "collectionFormat": "multi"
           },
           {
+            "name": "claimPremium",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "subscriptionId",
             "in": "formData",
             "required": false,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/complaints": {
+      "get": {
+        "tags": ["complaint-controller"],
+        "summary": "read",
+        "operationId": "readUsingGET_1",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ComplaintReadListResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": ["complaint-controller"],
+        "summary": "create",
+        "operationId": "createUsingPOST_1",
+        "consumes": ["application/json"],
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "description": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ComplaintRequest"
+            }
           }
         ],
         "responses": {
@@ -1729,6 +2062,20 @@
             "type": "string"
           },
           {
+            "name": "duration",
+            "in": "query",
+            "description": "duration",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "policy",
+            "in": "query",
+            "description": "policy",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "selected",
             "in": "query",
             "description": "selected",
@@ -1821,7 +2168,7 @@
       "get": {
         "tags": ["subscription-controller"],
         "summary": "read",
-        "operationId": "readUsingGET_1",
+        "operationId": "readUsingGET_2",
         "produces": ["*/*"],
         "parameters": [
           {
@@ -1861,6 +2208,62 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/subscriptions/{id}/cancel": {
+      "delete": {
+        "tags": ["subscription-controller"],
+        "summary": "cancel",
+        "operationId": "cancelUsingDELETE",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "reasons",
+            "in": "query",
+            "description": "reasons",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/BaseResponse"
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         }
       }
@@ -2283,6 +2686,12 @@
           "type": "integer",
           "format": "int32"
         },
+        "claimNarration": {
+          "type": "string"
+        },
+        "claimPremium": {
+          "type": "string"
+        },
         "claimStatus": {
           "type": "string"
         },
@@ -2371,6 +2780,75 @@
         }
       },
       "title": "ClaimToggleRequest"
+    },
+    "Complaint": {
+      "type": "object",
+      "properties": {
+        "complaintCode": {
+          "type": "string"
+        },
+        "complaintCreatedAt": {
+          "type": "string"
+        },
+        "complaintDescription": {
+          "type": "string"
+        },
+        "complaintId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "complaintStatus": {
+          "type": "string"
+        },
+        "complaintUpdatedAt": {
+          "type": "string"
+        },
+        "complaintUserId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Complaint"
+    },
+    "ComplaintReadListResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Complaint"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "ComplaintReadListResponse"
+    },
+    "ComplaintRequest": {
+      "type": "object",
+      "required": ["complaintDescription"],
+      "properties": {
+        "complaintDescription": {
+          "type": "string"
+        }
+      },
+      "title": "ComplaintRequest"
+    },
+    "ComplaintToggleRequest": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "pattern": "^(RESOLVED|REJECTED)$"
+        }
+      },
+      "title": "ComplaintToggleRequest"
     },
     "CompleteEnrollmentRequest": {
       "type": "object",
@@ -2597,6 +3075,65 @@
         }
       },
       "title": "GetClaimsResponse"
+    },
+    "GetComplaintResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/Complaint"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetComplaintResponse"
+    },
+    "GetComplaintsResponse": {
+      "type": "object",
+      "required": [
+        "data",
+        "openCount",
+        "rejectedCount",
+        "resolvedCount",
+        "responseCode",
+        "responseMessage",
+        "totalSize"
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Complaint"
+          }
+        },
+        "openCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rejectedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "resolvedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        },
+        "totalSize": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "GetComplaintsResponse"
     },
     "GetSubscriptionResponse": {
       "type": "object",
@@ -2904,8 +3441,14 @@
         "nextPaymentDate": {
           "type": "string"
         },
+        "s3Url": {
+          "type": "string"
+        },
         "subscriptionAssuredSum": {
           "type": "number"
+        },
+        "subscriptionCancellationReasons": {
+          "type": "string"
         },
         "subscriptionContributionFrequency": {
           "type": "string"

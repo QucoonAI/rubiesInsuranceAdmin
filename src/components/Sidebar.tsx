@@ -4,6 +4,7 @@ import {
   Users,
   FileText,
   AlertCircle,
+  MessageSquareWarning,
   LayoutDashboard,
   Settings as SettingsIcon,
   LogOut
@@ -21,6 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) 
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'subscriptions', label: 'Subscriptions', icon: FileText },
     { id: 'claims', label: 'Claims', icon: AlertCircle },
+    { id: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
   ];
 
   return (

@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import Customers from './components/Customers';
 import Subscriptions from './components/Subscriptions';
 import Claims from './components/Claims';
+import Complaints from './components/Complaints';
 import Settings from './components/Settings';
 import Login from './components/Login';
 import { Search, Bell, X, CheckCheck, Plus, UserPlus, FilePlus, PieChart } from 'lucide-react';
@@ -47,6 +48,7 @@ const App: React.FC = () => {
       case 'customers': return <Customers />;
       case 'subscriptions': return <Subscriptions />;
       case 'claims': return <Claims />;
+      case 'complaints': return <Complaints />;
       case 'settings': return <Settings />;
       default: return <Dashboard />;
     }

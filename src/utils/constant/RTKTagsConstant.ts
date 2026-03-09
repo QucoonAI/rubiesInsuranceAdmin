@@ -34,4 +34,9 @@ export const RTKTagsConstant = {
         DETAIL: 'CustomerDetail',
         INDEX: 'Customer',
     },
+    COMPLAINT_TAGS: {
+        LIST: 'ComplaintList',
+        DETAIL: 'ComplaintDetail',
+        INDEX: 'Complaint',
+    },
 };
