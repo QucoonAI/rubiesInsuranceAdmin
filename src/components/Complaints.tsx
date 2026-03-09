@@ -1,10 +1,28 @@
 
 import React, { useState, useMemo } from 'react';
-import { Search, Download, RefreshCw, ArrowRight, X, AlertTriangle, Loader2 } from 'lucide-react';
+import { Search, Download, RefreshCw, ArrowRight, AlertTriangle, Loader2 } from 'lucide-react';
 import { exportToCSV } from '../utils/csvExport';
 import { complaintServiceApi } from '@/service/api/ComplaintServiceApi';
 import { ApiComplaint } from '@/types/api';
 import { toast } from 'sonner';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+  DrawerClose,
+} from '@/components/ui/drawer';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
 const Complaints: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -70,7 +88,7 @@ const Complaints: React.FC = () => {
     const s = (status || '').toUpperCase();
     if (s === 'RESOLVED') return 'bg-emerald-50 text-emerald-700 border-emerald-100';
     if (s === 'REJECTED') return 'bg-rose-50 text-rose-700 border-rose-100';
-    return 'bg-amber-50 text-amber-700 border-amber-100'; // OPEN or default
+    return 'bg-amber-50 text-amber-700 border-amber-100';
   };
 
   const getStatusLabel = (status?: string) => {
@@ -235,26 +253,27 @@ const Complaints: React.FC = () => {
         </div>
       )}
 
-      {/* Detail Drawer */}
-      {selectedComplaint && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setSelectedComplaint(null)} />
-          <div className="relative w-full max-w-lg bg-white h-full shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
-              <div>
-                <h3 className="text-lg font-black text-[#0D0D12] tracking-tight">
-                  {selectedComplaint.complaintCode || `Complaint #${selectedComplaint.complaintId}`}
-                </h3>
-                <span className={`inline-block mt-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(selectedComplaint.complaintStatus)}`}>
-                  {getStatusLabel(selectedComplaint.complaintStatus)}
-                </span>
-              </div>
-              <button onClick={() => setSelectedComplaint(null)} className="p-2 hover:bg-slate-100 rounded-xl">
-                <X className="w-5 h-5 text-slate-400" />
-              </button>
-            </div>
+      {/* Detail Drawer (shadcn/vaul — right slide) */}
+      <Drawer
+        open={!!selectedComplaint}
+        onOpenChange={(open) => { if (!open) setSelectedComplaint(null); }}
+        direction="right"
+        shouldScaleBackground={false}
+      >
+        <DrawerContent className="h-full w-full max-w-lg ml-auto rounded-none border-l border-slate-200">
+          <DrawerHeader className="p-6 border-b border-slate-100">
+            <DrawerTitle className="text-lg font-black text-[#0D0D12] tracking-tight">
+              {selectedComplaint?.complaintCode || `Complaint #${selectedComplaint?.complaintId}`}
+            </DrawerTitle>
+            {selectedComplaint && (
+              <span className={`inline-block w-fit mt-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(selectedComplaint.complaintStatus)}`}>
+                {getStatusLabel(selectedComplaint.complaintStatus)}
+              </span>
+            )}
+          </DrawerHeader>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {selectedComplaint && (
               <div className="bg-slate-50 rounded-[28px] p-6 space-y-4">
                 <div>
                   <label className="text-[9px] text-slate-400 font-black uppercase tracking-[2px]">Complaint Code</label>
@@ -289,70 +308,68 @@ const Complaints: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            {isActionable(selectedComplaint.complaintStatus) && (
-              <div className="p-6 border-t border-slate-100 flex gap-3 shrink-0">
-                <button
-                  onClick={() => setConfirmAction({ type: 'RESOLVED', complaint: selectedComplaint })}
-                  className="flex-1 py-3 bg-emerald-500 text-white rounded-2xl font-bold text-sm hover:bg-emerald-600 transition-colors"
-                >
-                  Resolve
-                </button>
-                <button
-                  onClick={() => setConfirmAction({ type: 'REJECTED', complaint: selectedComplaint })}
-                  className="flex-1 py-3 bg-rose-500 text-white rounded-2xl font-bold text-sm hover:bg-rose-600 transition-colors"
-                >
-                  Reject
-                </button>
-              </div>
             )}
           </div>
-        </div>
-      )}
 
-      {/* Confirmation Modal */}
-      {confirmAction && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setConfirmAction(null)} />
-          <div className="relative bg-white rounded-[32px] p-8 max-w-md w-full mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex items-center gap-3 mb-4">
-              <div className={`p-3 rounded-2xl ${confirmAction.type === 'RESOLVED' ? 'bg-emerald-50' : 'bg-rose-50'}`}>
-                <AlertTriangle className={`w-6 h-6 ${confirmAction.type === 'RESOLVED' ? 'text-emerald-600' : 'text-rose-600'}`} />
+          {/* Action Buttons */}
+          {selectedComplaint && isActionable(selectedComplaint.complaintStatus) && (
+            <DrawerFooter className="p-6 border-t border-slate-100 flex-row gap-3">
+              <button
+                onClick={() => setConfirmAction({ type: 'RESOLVED', complaint: selectedComplaint })}
+                className="flex-1 py-3 bg-emerald-500 text-white rounded-2xl font-bold text-sm hover:bg-emerald-600 transition-colors"
+              >
+                Resolve
+              </button>
+              <button
+                onClick={() => setConfirmAction({ type: 'REJECTED', complaint: selectedComplaint })}
+                className="flex-1 py-3 bg-rose-500 text-white rounded-2xl font-bold text-sm hover:bg-rose-600 transition-colors"
+              >
+                Reject
+              </button>
+            </DrawerFooter>
+          )}
+        </DrawerContent>
+      </Drawer>
+
+      {/* Confirmation Modal (shadcn AlertDialog) */}
+      <AlertDialog open={!!confirmAction} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
+        <AlertDialogContent className="rounded-[32px] border-slate-200 bg-white p-0 gap-0 max-w-md">
+          <div className="p-8">
+            <AlertDialogHeader className="space-y-0">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`p-3 rounded-2xl ${confirmAction?.type === 'RESOLVED' ? 'bg-emerald-50' : 'bg-rose-50'}`}>
+                  <AlertTriangle className={`w-6 h-6 ${confirmAction?.type === 'RESOLVED' ? 'text-emerald-600' : 'text-rose-600'}`} />
+                </div>
+                <AlertDialogTitle className="text-lg font-black text-[#0D0D12] tracking-tight">
+                  {confirmAction?.type === 'RESOLVED' ? 'Resolve' : 'Reject'} Complaint
+                </AlertDialogTitle>
               </div>
-              <h3 className="text-lg font-black text-[#0D0D12] tracking-tight">
-                {confirmAction.type === 'RESOLVED' ? 'Resolve' : 'Reject'} Complaint
-              </h3>
-            </div>
-            <p className="text-sm text-slate-500 mb-6">
-              Are you sure you want to {confirmAction.type === 'RESOLVED' ? 'resolve' : 'reject'} complaint{' '}
-              <span className="font-bold text-[#0D0D12]">{confirmAction.complaint.complaintCode || `#${confirmAction.complaint.complaintId}`}</span>?
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm hover:bg-slate-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleToggle}
-                disabled={isToggling}
-                className={`flex-1 py-3 text-white rounded-2xl font-bold text-sm transition-colors flex items-center justify-center gap-2 ${
-                  confirmAction.type === 'RESOLVED'
-                    ? 'bg-emerald-500 hover:bg-emerald-600'
-                    : 'bg-rose-500 hover:bg-rose-600'
-                }`}
-              >
-                {isToggling && <Loader2 className="w-4 h-4 animate-spin" />}
-                {confirmAction.type === 'RESOLVED' ? 'Resolve' : 'Reject'}
-              </button>
-            </div>
+              <AlertDialogDescription className="text-sm text-slate-500">
+                Are you sure you want to {confirmAction?.type === 'RESOLVED' ? 'resolve' : 'reject'} complaint{' '}
+                <span className="font-bold text-[#0D0D12]">{confirmAction?.complaint.complaintCode || `#${confirmAction?.complaint.complaintId}`}</span>?
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
           </div>
-        </div>
-      )}
+          <AlertDialogFooter className="bg-slate-50 px-8 py-5 border-t border-slate-100 sm:space-x-0 gap-3 rounded-b-[32px]">
+            <AlertDialogCancel className="px-5 py-2.5 text-sm font-bold text-slate-500 bg-transparent border-0 shadow-none hover:bg-transparent">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleToggle}
+              disabled={isToggling}
+              className={`px-7 py-2.5 rounded-2xl text-sm font-bold shadow-lg text-white border-0 ${
+                confirmAction?.type === 'RESOLVED'
+                  ? 'bg-emerald-500 hover:bg-emerald-600'
+                  : 'bg-rose-500 hover:bg-rose-600'
+              }`}
+            >
+              {isToggling && <Loader2 className="w-4 h-4 animate-spin" />}
+              {confirmAction?.type === 'RESOLVED' ? 'Resolve' : 'Reject'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
