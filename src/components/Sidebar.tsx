@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { 
-  Users, 
-  FileText, 
-  CreditCard, 
-  AlertCircle, 
+import {
+  Users,
+  FileText,
+  AlertCircle,
+  MessageSquareWarning,
   LayoutDashboard,
   Settings as SettingsIcon,
   LogOut,
-  Bell
+  FileCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -22,9 +22,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) 
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'subscriptions', label: 'Subscriptions', icon: FileText },
-    { id: 'payments', label: 'Payments', icon: CreditCard },
+    { id: 'policy-documents', label: 'Policy Documents', icon: FileCheck },
     { id: 'claims', label: 'Claims', icon: AlertCircle },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
   ];
 
   return (

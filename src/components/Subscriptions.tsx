@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef } from 'react';
-import { Download, Eye, FileCheck, PieChart, X, Send, Mail, Calendar } from 'lucide-react';
+import { Download, Eye, FileCheck, PieChart, X, Calendar, RefreshCw } from 'lucide-react';
 import { exportToCSV } from '../utils/csvExport';
 import { subscriptionServiceApi } from '@/service/api/SubscriptionServiceApi';
 import { ApiSubscription } from '@/types/api';
@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 const Subscriptions: React.FC = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  const { data, isLoading, isError, refetch } = subscriptionServiceApi.useGetSubscriptionsQuery({
+  const { data, isLoading, isError, isFetching, refetch } = subscriptionServiceApi.useGetSubscriptionsQuery({
     page: page.toString(),
     size: pageSize.toString(),
   });
@@ -24,10 +24,6 @@ const Subscriptions: React.FC = () => {
   const [reportDateFrom, setReportDateFrom] = useState('');
   const [reportDateTo, setReportDateTo] = useState('');
   const [reportStatus, setReportStatus] = useState('all');
-
-  // Email modal
-  const [showEmail, setShowEmail] = useState(false);
-  const [emailAddress, setEmailAddress] = useState('');
 
   const filteredSubs = useMemo(() => {
     return subscriptions.filter(s => {
@@ -68,8 +64,8 @@ const Subscriptions: React.FC = () => {
               <div><div class="label">Policy Name</div><div class="value">${viewingCert?.subscriptionPolicyName || '—'}</div></div>
               <div><div class="label">Status</div><div class="value">${viewingCert?.subscriptionStatus || '—'}</div></div>
               <div><div class="label">Effective Term</div><div class="value">${viewingCert?.subscriptionStartDate || '—'} — ${viewingCert?.subscriptionEndDate || '—'}</div></div>
-              <div><div class="label">Payment Amount</div><div class="value">$${viewingCert?.subscriptionPaymentAmount ?? 0}</div></div>
-              <div><div class="label">Assured Sum</div><div class="value">$${(viewingCert?.subscriptionAssuredSum ?? 0).toLocaleString()}</div></div>
+              <div><div class="label">Payment Amount</div><div class="value">₦${viewingCert?.subscriptionPaymentAmount ?? 0}</div></div>
+              <div><div class="label">Assured Sum</div><div class="value">₦${(viewingCert?.subscriptionAssuredSum ?? 0).toLocaleString()}</div></div>
               <div><div class="label">Frequency</div><div class="value">${viewingCert?.subscriptionContributionFrequency || '—'}</div></div>
             </div>
             <div class="footer">Issued by Rubies Insure Corporate Security. This electronic record is cryptographically signed and legally binding.</div>
@@ -80,16 +76,6 @@ const Subscriptions: React.FC = () => {
       }
     }
     toast.success('Certificate PDF generated');
-  };
-
-  const handleSendEmail = () => {
-    if (!emailAddress.trim()) {
-      toast.error('Please enter an email address');
-      return;
-    }
-    toast.success(`Certificate sent to ${emailAddress}`);
-    setShowEmail(false);
-    setEmailAddress('');
   };
 
   return (
@@ -113,6 +99,13 @@ const Subscriptions: React.FC = () => {
           >
             <PieChart className="w-4 h-4" />
             Performance
+          </button>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="p-2 border border-slate-200 bg-white text-slate-400 rounded-xl hover:bg-slate-50 hover:text-[#0D0D12] transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </header>
@@ -164,7 +157,7 @@ const Subscriptions: React.FC = () => {
                       {sub.subscriptionStatus || '—'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-black text-[#0D0D12]">${sub.subscriptionPaymentAmount ?? 0}</td>
+                  <td className="px-6 py-4 text-sm font-black text-[#0D0D12]">₦{sub.subscriptionPaymentAmount ?? 0}</td>
                   <td className="px-6 py-4 text-right">
                     <button
                       onClick={() => setViewingCert(sub)}
@@ -261,7 +254,7 @@ const Subscriptions: React.FC = () => {
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Policies</div>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <div className="text-2xl font-black text-[#0D0D12]">${reportSummary.totalPremium.toLocaleString()}</div>
+                  <div className="text-2xl font-black text-[#0D0D12]">₦{reportSummary.totalPremium.toLocaleString()}</div>
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Premium</div>
                 </div>
                 <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
@@ -296,7 +289,7 @@ const Subscriptions: React.FC = () => {
                         <tr key={sub.subscriptionId} className="hover:bg-slate-50/50">
                           <td className="px-4 py-3 font-mono text-xs font-bold text-slate-500">SUB-{sub.subscriptionId}</td>
                           <td className="px-4 py-3 text-sm font-bold text-[#0D0D12]">{sub.subscriptionPolicyName || '—'}</td>
-                          <td className="px-4 py-3 text-sm font-black text-[#0D0D12]">${sub.subscriptionPaymentAmount ?? 0}</td>
+                          <td className="px-4 py-3 text-sm font-black text-[#0D0D12]">₦{sub.subscriptionPaymentAmount ?? 0}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest ${
                               sub.subscriptionStatus === 'Active' ? 'bg-emerald-50 text-emerald-700' :
@@ -379,11 +372,11 @@ const Subscriptions: React.FC = () => {
                 </div>
                 <div>
                   <label className="text-[9px] uppercase text-slate-300 font-black mb-1 block tracking-widest">Payment Amount</label>
-                  <p className="text-[#0D0D12] font-black text-lg">${viewingCert.subscriptionPaymentAmount ?? 0}</p>
+                  <p className="text-[#0D0D12] font-black text-lg">₦{viewingCert.subscriptionPaymentAmount ?? 0}</p>
                 </div>
                 <div>
                   <label className="text-[9px] uppercase text-slate-300 font-black mb-1 block tracking-widest">Assured Sum</label>
-                  <p className="font-bold text-slate-600">${(viewingCert.subscriptionAssuredSum ?? 0).toLocaleString()}</p>
+                  <p className="font-bold text-slate-600">₦{(viewingCert.subscriptionAssuredSum ?? 0).toLocaleString()}</p>
                 </div>
                 <div>
                   <label className="text-[9px] uppercase text-slate-300 font-black mb-1 block tracking-widest">Frequency</label>
@@ -400,68 +393,11 @@ const Subscriptions: React.FC = () => {
 
             <div className="p-8 bg-slate-50 flex justify-end gap-3">
               <button
-                onClick={() => { setShowEmail(true); }}
-                className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-100 transition-all text-sm flex items-center gap-2"
-              >
-                <Mail className="w-4 h-4" />
-                Distribute via Email
-              </button>
-              <button
                 onClick={handleDownloadPDF}
                 className="px-6 py-3 bg-[#0D0D12] text-white rounded-2xl font-bold hover:bg-black flex items-center gap-2 shadow-xl shadow-slate-200 transition-all text-sm"
               >
                 <Download className="w-4 h-4" />
                 Download PDF
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Email Distribution Modal */}
-      {showEmail && (
-        <div className="fixed inset-0 bg-[#0D0D12]/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[40px] w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-            <div className="p-8 border-b border-slate-100 flex justify-between items-center">
-              <div>
-                <h3 className="text-xl font-black text-[#0D0D12] tracking-tighter">Distribute Certificate</h3>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">SUB-{viewingCert?.subscriptionId}</p>
-              </div>
-              <button onClick={() => setShowEmail(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-8 space-y-5">
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-sm font-bold text-[#0D0D12]">{viewingCert?.subscriptionPolicyName}</p>
-                <p className="text-[10px] text-slate-400 font-medium">Certificate will be sent as PDF attachment</p>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Recipient Email *</label>
-                <input
-                  type="email"
-                  value={emailAddress}
-                  onChange={e => setEmailAddress(e.target.value)}
-                  placeholder="customer@email.com"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-slate-100 flex justify-end gap-3">
-              <button
-                onClick={() => setShowEmail(false)}
-                className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-all text-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSendEmail}
-                className="px-6 py-3 bg-[#0D0D12] text-white rounded-2xl font-bold hover:bg-black shadow-lg shadow-slate-200 transition-all text-sm flex items-center gap-2"
-              >
-                <Send className="w-4 h-4" />
-                Send
               </button>
             </div>
           </div>

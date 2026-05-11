@@ -6,6 +6,8 @@ import { paymentServiceApi } from "@/service/api/PaymentServiceApi";
 import { kycServiceApi } from "@/service/api/KycServiceApi";
 import { policyServiceApi } from "@/service/api/PolicyServiceApi";
 import { customerServiceApi } from "@/service/api/CustomerServiceApi";
+import { complaintServiceApi } from "@/service/api/ComplaintServiceApi";
+import { policyDocumentServiceApi } from "@/service/api/PolicyDocumentServiceApi";
 
 export const reducerApi = {
     [authServiceApi.reducerPath]: authServiceApi.reducer,
@@ -16,6 +18,8 @@ export const reducerApi = {
     [kycServiceApi.reducerPath]: kycServiceApi.reducer,
     [policyServiceApi.reducerPath]: policyServiceApi.reducer,
     [customerServiceApi.reducerPath]: customerServiceApi.reducer,
+    [complaintServiceApi.reducerPath]: complaintServiceApi.reducer,
+    [policyDocumentServiceApi.reducerPath]: policyDocumentServiceApi.reducer,
 };
 
 export const middlewareApi = [
@@ -27,4 +31,6 @@ export const middlewareApi = [
     kycServiceApi.middleware,
     policyServiceApi.middleware,
     customerServiceApi.middleware,
+    complaintServiceApi.middleware,
+    policyDocumentServiceApi.middleware,
 ];

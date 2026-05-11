@@ -1,54 +1,51 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  FileSearch, MessageSquare, FileText,
-  ArrowRight, ShieldAlert, Download, BrainCircuit, Send,
-  FileImage, Calendar, X, Eye, ChevronLeft
+  FileSearch, FileText,
+  ArrowRight, ShieldAlert, Download, BrainCircuit,
+  FileImage, Calendar, X, Eye, ChevronLeft, Loader2, RefreshCw
 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import { exportToCSV } from '../utils/csvExport';
 import { claimServiceApi } from '@/service/api/ClaimServiceApi';
+import { paymentServiceApi } from '@/service/api/PaymentServiceApi';
 import { ApiClaim } from '@/types/api';
 import { toast } from 'sonner';
-
-const mockDocuments = [
-  { id: 1, name: 'Loss_Report.pdf', type: 'pdf', size: '2.4 MB', date: '2024-01-15' },
-  { id: 2, name: 'Photo_Evidence_1.jpg', type: 'image', size: '1.8 MB', date: '2024-01-15' },
-  { id: 3, name: 'Medical_Certificate.pdf', type: 'pdf', size: '890 KB', date: '2024-01-17' },
-  { id: 4, name: 'Police_Report.pdf', type: 'pdf', size: '1.2 MB', date: '2024-01-18' },
-];
-
-const mockMessages = [
-  { id: 1, sender: 'Customer', text: 'I have submitted all required documents for my claim.', time: '09:30 AM', isAdmin: false },
-  { id: 2, sender: 'Admin', text: 'Received. We are reviewing your documents now.', time: '02:22 PM', isAdmin: true },
-  { id: 3, sender: 'Customer', text: 'How long will the review process take?', time: '10:15 AM', isAdmin: false },
-  { id: 4, sender: 'Admin', text: "Standard review is 5-7 business days. We'll keep you updated.", time: '11:45 AM', isAdmin: true },
-];
 
 const Claims: React.FC = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  const { data, isLoading, isError, refetch } = claimServiceApi.useGetClaimsQuery({
+  const { data, isLoading, isError, isFetching, refetch } = claimServiceApi.useGetClaimsQuery({
     page: page.toString(),
     size: pageSize.toString(),
   });
   const claims = data?.data ?? [];
   const totalSize = data?.totalSize ?? 0;
 
+  const [toggleClaimStatus, { isLoading: isToggling }] = claimServiceApi.useToggleClaimStatusMutation();
+
   const [selectedClaim, setSelectedClaim] = useState<ApiClaim | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [analyzing, setAnalyzing] = useState(false);
 
+  // Document queries
+  const { data: docsData, isLoading: docsLoading } = claimServiceApi.useGetClaimDocumentsQuery(
+    selectedClaim?.claimId ?? 0,
+    { skip: !selectedClaim }
+  );
+  const claimDocuments = docsData?.data ?? [];
+  const [getDocUrl] = claimServiceApi.useLazyGetClaimDocumentUrlQuery();
+
+  // Banks for settle form
+  const { data: banksData } = paymentServiceApi.useGetBanksQuery();
+  const banks = banksData?.data ?? [];
+
   // Modal view states
-  const [modalView, setModalView] = useState<'details' | 'messages'>('details');
   const [claimAction, setClaimAction] = useState<'reject' | 'settle' | null>(null);
   const [rejectReason, setRejectReason] = useState('');
-  const [settleNotes, setSettleNotes] = useState('');
-  const [settleMethod, setSettleMethod] = useState('bank_transfer');
-
-  // Messaging
-  const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState(mockMessages);
+  const [settleAccountName, setSettleAccountName] = useState('');
+  const [settleAccountNumber, setSettleAccountNumber] = useState('');
+  const [settleBankCode, setSettleBankCode] = useState('');
 
   // Report modal
   const [showReport, setShowReport] = useState(false);
@@ -56,14 +53,12 @@ const Claims: React.FC = () => {
   const [reportDateTo, setReportDateTo] = useState('');
   const [reportStatus, setReportStatus] = useState('all');
 
-  const pipelineCounts = useMemo(() => {
-    const counts: Record<string, number> = { Reported: 0, Registered: 0, Outstanding: 0, Settled: 0, Rejected: 0 };
-    claims.forEach(c => {
-      const status = c.claimStatus || '';
-      if (status in counts) counts[status]++;
-    });
-    return counts;
-  }, [claims]);
+  const pipelineCounts = useMemo(() => ({
+    Pending: data?.pendingCount ?? 0,
+    Approved: data?.approvedCount ?? 0,
+    Settled: data?.settledCount ?? 0,
+    Rejected: data?.rejectedCount ?? 0,
+  }), [data]);
 
   const filteredClaims = useMemo(() => {
     return claims.filter(c => {
@@ -87,7 +82,7 @@ const Claims: React.FC = () => {
   const runAiAnalysis = async (claim: ApiClaim) => {
     setAnalyzing(true);
     try {
-      const description = `Claim #${claim.claimId} for subscription "${claim.claimSubscriptionName}" with amount $${claim.claimAmount}. Status: ${claim.claimStatus}.`;
+      const description = `Claim #${claim.claimId} for subscription "${claim.claimSubscriptionName}" with amount ₦${claim.claimAmount}. Status: ${claim.claimStatus}.`;
       const result = await geminiService.analyzeClaim(description, []);
       setAiAnalysis(result || '');
     } catch {
@@ -100,44 +95,72 @@ const Claims: React.FC = () => {
     setSelectedClaim(claim);
     setAiAnalysis('');
     setClaimAction(null);
-    setModalView('details');
   };
 
-  const handleAcceptClaim = () => {
-    toast.success(`Claim CLM-${selectedClaim?.claimId} has been accepted`);
-    setSelectedClaim(null);
+  const handleAcceptClaim = async () => {
+    if (!selectedClaim?.claimId) return;
+    try {
+      await toggleClaimStatus({ claimId: selectedClaim.claimId, action: 'APPROVED' }).unwrap();
+      toast.success(`Claim CLM-${selectedClaim.claimId} has been accepted`);
+      setSelectedClaim(null);
+    } catch {
+      toast.error('Failed to accept claim');
+    }
   };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = async () => {
+    if (!selectedClaim?.claimId) return;
     if (!rejectReason.trim()) {
       toast.error('Please provide a reason for rejection');
       return;
     }
-    toast.success(`Claim CLM-${selectedClaim?.claimId} has been rejected`);
-    setClaimAction(null);
-    setRejectReason('');
-    setSelectedClaim(null);
+    try {
+      await toggleClaimStatus({ claimId: selectedClaim.claimId, action: 'REJECTED' }).unwrap();
+      toast.success(`Claim CLM-${selectedClaim.claimId} has been rejected`);
+      setClaimAction(null);
+      setRejectReason('');
+      setSelectedClaim(null);
+    } catch {
+      toast.error('Failed to reject claim');
+    }
   };
 
-  const handleConfirmSettle = () => {
-    toast.success(`Claim CLM-${selectedClaim?.claimId} settlement of $${(selectedClaim?.claimAmount ?? 0).toLocaleString()} initiated`);
-    setClaimAction(null);
-    setSettleNotes('');
-    setSettleMethod('bank_transfer');
-    setSelectedClaim(null);
+  const handleConfirmSettle = async () => {
+    if (!selectedClaim?.claimId) return;
+    if (!settleAccountName.trim() || !settleAccountNumber.trim() || !settleBankCode) {
+      toast.error('Please fill in all bank details');
+      return;
+    }
+    const selectedBank = banks.find(b => b.bankCode === settleBankCode);
+    try {
+      await toggleClaimStatus({
+        claimId: selectedClaim.claimId,
+        action: 'SETTLED',
+        recipientAccountName: settleAccountName,
+        recipientAccountNumber: settleAccountNumber,
+        recipientBankCode: settleBankCode,
+        recipientBankName: selectedBank?.bankName || '',
+      }).unwrap();
+      toast.success(`Claim CLM-${selectedClaim.claimId} settlement initiated`);
+      setClaimAction(null);
+      setSettleAccountName('');
+      setSettleAccountNumber('');
+      setSettleBankCode('');
+      setSelectedClaim(null);
+    } catch {
+      toast.error('Failed to settle claim');
+    }
   };
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    setMessages(prev => [...prev, {
-      id: prev.length + 1,
-      sender: 'Admin',
-      text: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isAdmin: true,
-    }]);
-    setNewMessage('');
-    toast.success('Message sent to customer');
+  const handleViewDocument = async (claimId: number, documentId: number) => {
+    try {
+      const result = await getDocUrl({ claimId, documentId }).unwrap();
+      if (result.data) {
+        window.open(result.data, '_blank');
+      }
+    } catch {
+      toast.error('Failed to load document');
+    }
   };
 
   return (
@@ -162,6 +185,13 @@ const Claims: React.FC = () => {
             <Calendar className="w-4 h-4" />
             Strategy Report
           </button>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="p-2 border border-slate-200 bg-white text-slate-400 rounded-xl hover:bg-slate-50 hover:text-[#0D0D12] transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+          </button>
         </div>
       </header>
 
@@ -173,11 +203,10 @@ const Claims: React.FC = () => {
       )}
 
       {/* Pipeline Visualization */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Reported', color: 'bg-[#0D0D12]' },
-          { label: 'Registered', color: 'bg-[#0D0D12]/60' },
-          { label: 'Outstanding', color: 'bg-amber-500' },
+          { label: 'Pending', color: 'bg-[#0D0D12]' },
+          { label: 'Approved', color: 'bg-blue-500' },
           { label: 'Settled', color: 'bg-emerald-500' },
           { label: 'Rejected', color: 'bg-rose-500' },
         ].map((step, idx) => (
@@ -222,7 +251,7 @@ const Claims: React.FC = () => {
                 <tr key={claim.claimId} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-6 py-5 font-mono text-xs font-bold text-slate-400 group-hover:text-[#0D0D12]">CLM-{claim.claimId}</td>
                   <td className="px-6 py-5 font-bold text-[#0D0D12]">{claim.claimSubscriptionName || '—'}</td>
-                  <td className="px-6 py-5 font-black text-[#0D0D12]">${(claim.claimAmount ?? 0).toLocaleString()}</td>
+                  <td className="px-6 py-5 font-black text-[#0D0D12]">₦{(claim.claimAmount ?? 0).toLocaleString()}</td>
                   <td className="px-6 py-5">
                     <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
                       claim.claimStatus === 'Settled' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
@@ -329,7 +358,7 @@ const Claims: React.FC = () => {
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Claims</div>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <div className="text-2xl font-black text-[#0D0D12]">${reportSummary.totalAmount.toLocaleString()}</div>
+                  <div className="text-2xl font-black text-[#0D0D12]">₦{reportSummary.totalAmount.toLocaleString()}</div>
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Value</div>
                 </div>
                 <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
@@ -364,7 +393,7 @@ const Claims: React.FC = () => {
                         <tr key={claim.claimId} className="hover:bg-slate-50/50">
                           <td className="px-4 py-3 font-mono text-xs font-bold text-slate-500">CLM-{claim.claimId}</td>
                           <td className="px-4 py-3 text-sm font-bold text-[#0D0D12]">{claim.claimSubscriptionName || '—'}</td>
-                          <td className="px-4 py-3 text-sm font-black text-[#0D0D12]">${(claim.claimAmount ?? 0).toLocaleString()}</td>
+                          <td className="px-4 py-3 text-sm font-black text-[#0D0D12]">₦{(claim.claimAmount ?? 0).toLocaleString()}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest ${
                               claim.claimStatus === 'Settled' ? 'bg-emerald-50 text-emerald-700' :
@@ -414,7 +443,7 @@ const Claims: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-[#0D0D12] tracking-tighter uppercase italic">CLM-{selectedClaim.claimId} — Portfolio Review</h3>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Adjusting valuation: <span className="text-[#0D0D12]">${(selectedClaim.claimAmount ?? 0).toLocaleString()}.00</span></p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Adjusting valuation: <span className="text-[#0D0D12]">₦{(selectedClaim.claimAmount ?? 0).toLocaleString()}.00</span></p>
                 </div>
               </div>
               <button onClick={() => setSelectedClaim(null)} className="p-3 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
@@ -425,8 +454,7 @@ const Claims: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Left Column */}
               <div className="space-y-8">
-                {modalView === 'details' ? (
-                  <>
+                <>
                     {/* Case Details */}
                     <div>
                       <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Case Details</h4>
@@ -454,98 +482,55 @@ const Claims: React.FC = () => {
                     <div>
                       <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Supporting Documents</h4>
                       <div className="space-y-2">
-                        {mockDocuments.map(doc => (
-                          <div key={doc.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-all group">
-                            <div className="p-2 bg-white rounded-xl border border-slate-100 group-hover:bg-[#0D0D12] group-hover:border-[#0D0D12] transition-colors">
-                              {doc.type === 'pdf' ? (
-                                <FileText className="w-4 h-4 text-slate-500 group-hover:text-white" />
-                              ) : (
-                                <FileImage className="w-4 h-4 text-slate-500 group-hover:text-white" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-[#0D0D12] truncate">{doc.name}</p>
-                              <p className="text-[10px] text-slate-400 font-medium">{doc.size} · {doc.date}</p>
-                            </div>
-                            <button
-                              onClick={() => toast.info(`Previewing ${doc.name}`)}
-                              className="p-2 text-slate-300 hover:text-[#0D0D12] hover:bg-white rounded-lg transition-all"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
+                        {docsLoading ? (
+                          <div className="flex items-center justify-center p-6">
+                            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
                           </div>
-                        ))}
+                        ) : claimDocuments.length === 0 ? (
+                          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                            <p className="text-sm text-slate-400 font-medium">No documents uploaded</p>
+                          </div>
+                        ) : (
+                          claimDocuments.map(doc => {
+                            const fileName = doc.documentS3Key.split('/').pop() || doc.documentS3Key;
+                            const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
+                            return (
+                              <div key={doc.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-all group">
+                                <div className="p-2 bg-white rounded-xl border border-slate-100 group-hover:bg-[#0D0D12] group-hover:border-[#0D0D12] transition-colors">
+                                  {isImage ? (
+                                    <FileImage className="w-4 h-4 text-slate-500 group-hover:text-white" />
+                                  ) : (
+                                    <FileText className="w-4 h-4 text-slate-500 group-hover:text-white" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-bold text-[#0D0D12] truncate">{fileName}</p>
+                                  <p className="text-[10px] text-slate-400 font-medium">{doc.createdAt || '—'}</p>
+                                </div>
+                                <button
+                                  onClick={() => handleViewDocument(doc.claimId, doc.id)}
+                                  className="p-2 text-slate-300 hover:text-[#0D0D12] hover:bg-white rounded-lg transition-all"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => setModalView('messages')}
-                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        Secure Message
-                      </button>
+                    <div>
                       <button
                         onClick={() => toast.info('Internal audit trail initiated')}
-                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
+                        className="w-full flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
                       >
                         <FileSearch className="w-4 h-4" />
                         Internal Audit
                       </button>
                     </div>
-                  </>
-                ) : (
-                  /* Messages View */
-                  <>
-                    <div className="flex items-center gap-3 mb-2">
-                      <button
-                        onClick={() => setModalView('details')}
-                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px]">Secure Communication</h4>
-                    </div>
-                    <div className="bg-slate-50 rounded-[28px] border border-slate-100 flex flex-col h-[420px]">
-                      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                        {messages.map(msg => (
-                          <div key={msg.id} className={`flex ${msg.isAdmin ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] p-3 rounded-2xl ${
-                              msg.isAdmin
-                                ? 'bg-[#0D0D12] text-white rounded-br-lg'
-                                : 'bg-white border border-slate-200 text-slate-800 rounded-bl-lg'
-                            }`}>
-                              <p className="text-sm font-medium">{msg.text}</p>
-                              <p className={`text-[10px] mt-1 ${msg.isAdmin ? 'text-white/50' : 'text-slate-400'}`}>
-                                {msg.sender} · {msg.time}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="p-3 border-t border-slate-200">
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={newMessage}
-                            onChange={e => setNewMessage(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                            placeholder="Type a message..."
-                            className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
-                          />
-                          <button
-                            onClick={handleSendMessage}
-                            className="p-2.5 bg-[#0D0D12] text-white rounded-xl hover:bg-black transition-colors"
-                          >
-                            <Send className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
+                </>
               </div>
 
               {/* Right Column - AI + Actions */}
@@ -593,9 +578,10 @@ const Claims: React.FC = () => {
                     <div className="mt-8 pt-8 border-t border-white/10 space-y-3 relative z-10">
                       <button
                         onClick={handleAcceptClaim}
-                        className="w-full py-4 bg-emerald-500/10 text-emerald-400 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all text-xs"
+                        disabled={isToggling}
+                        className="w-full py-4 bg-emerald-500/10 text-emerald-400 rounded-2xl font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all text-xs disabled:opacity-50"
                       >
-                        Accept Claim
+                        {isToggling ? 'Processing...' : 'Accept Claim'}
                       </button>
                       <div className="flex gap-3">
                         <button
@@ -624,7 +610,7 @@ const Claims: React.FC = () => {
                     </div>
                     <div className="flex-1 space-y-6">
                       <div className="bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20">
-                        <p className="text-rose-400 text-sm font-bold">You are about to reject claim CLM-{selectedClaim.claimId} for ${(selectedClaim.claimAmount ?? 0).toLocaleString()}</p>
+                        <p className="text-rose-400 text-sm font-bold">You are about to reject claim CLM-{selectedClaim.claimId} for ₦{(selectedClaim.claimAmount ?? 0).toLocaleString()}</p>
                       </div>
                       <div>
                         <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Reason for Rejection *</label>
@@ -646,9 +632,10 @@ const Claims: React.FC = () => {
                       </button>
                       <button
                         onClick={handleConfirmReject}
-                        className="flex-1 py-4 bg-rose-500 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-rose-600 transition-all text-xs shadow-xl"
+                        disabled={isToggling}
+                        className="flex-1 py-4 bg-rose-500 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-rose-600 transition-all text-xs shadow-xl disabled:opacity-50"
                       >
-                        Confirm Rejection
+                        {isToggling ? 'Processing...' : 'Confirm Rejection'}
                       </button>
                     </div>
                   </div>
@@ -663,43 +650,58 @@ const Claims: React.FC = () => {
                     </div>
                     <div className="flex-1 space-y-6">
                       <div className="bg-emerald-500/10 p-4 rounded-2xl border border-emerald-500/20">
-                        <p className="text-emerald-400 text-sm font-bold">Settlement for CLM-{selectedClaim.claimId} — ${(selectedClaim.claimAmount ?? 0).toLocaleString()}</p>
+                        <p className="text-emerald-400 text-sm font-bold">Settlement for CLM-{selectedClaim.claimId} — ₦{(selectedClaim.claimAmount ?? 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Payment Method</label>
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Recipient Account Name *</label>
+                        <input
+                          type="text"
+                          value={settleAccountName}
+                          onChange={e => setSettleAccountName(e.target.value)}
+                          placeholder="Account holder name"
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder:text-white/20 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Recipient Account Number *</label>
+                        <input
+                          type="text"
+                          value={settleAccountNumber}
+                          onChange={e => setSettleAccountNumber(e.target.value.replace(/\D/g, ''))}
+                          placeholder="0000000000"
+                          maxLength={10}
+                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder:text-white/20 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Recipient Bank *</label>
                         <select
-                          value={settleMethod}
-                          onChange={e => setSettleMethod(e.target.value)}
+                          value={settleBankCode}
+                          onChange={e => setSettleBankCode(e.target.value)}
                           className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                         >
-                          <option value="bank_transfer" className="bg-[#0D0D12]">Bank Transfer</option>
-                          <option value="cheque" className="bg-[#0D0D12]">Cheque</option>
-                          <option value="mobile_money" className="bg-[#0D0D12]">Mobile Money</option>
+                          <option value="" className="bg-[#0D0D12]">Select a bank</option>
+                          {banks.map(bank => (
+                            <option key={bank.bankCode} value={bank.bankCode} className="bg-[#0D0D12]">
+                              {bank.bankName}
+                            </option>
+                          ))}
                         </select>
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2">Notes</label>
-                        <textarea
-                          value={settleNotes}
-                          onChange={e => setSettleNotes(e.target.value)}
-                          placeholder="Additional settlement notes..."
-                          rows={3}
-                          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white placeholder:text-white/20 focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none"
-                        />
                       </div>
                     </div>
                     <div className="flex gap-3 mt-8">
                       <button
-                        onClick={() => { setClaimAction(null); setSettleNotes(''); }}
+                        onClick={() => { setClaimAction(null); setSettleAccountName(''); setSettleAccountNumber(''); setSettleBankCode(''); }}
                         className="flex-1 py-4 bg-white/5 text-white/60 rounded-2xl font-bold hover:bg-white/10 transition-all text-sm"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleConfirmSettle}
-                        className="flex-1 py-4 bg-white text-[#0D0D12] rounded-2xl font-black uppercase tracking-widest hover:bg-slate-100 transition-all text-xs shadow-xl"
+                        disabled={isToggling}
+                        className="flex-1 py-4 bg-white text-[#0D0D12] rounded-2xl font-black uppercase tracking-widest hover:bg-slate-100 transition-all text-xs shadow-xl disabled:opacity-50"
                       >
-                        Confirm Settlement
+                        {isToggling ? 'Processing...' : 'Confirm Settlement'}
                       </button>
                     </div>
                   </div>

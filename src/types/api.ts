@@ -150,6 +150,35 @@ export interface ClaimReadListResponse extends BaseResponse {
 export interface GetClaimsResponse extends BaseResponse {
   data: ApiClaim[];
   totalSize: number;
+  approvedCount: number;
+  pendingCount: number;
+  rejectedCount: number;
+  settledCount: number;
+}
+
+export interface ClaimToggleRequest {
+  action: 'APPROVED' | 'REJECTED' | 'SETTLED';
+  recipientAccountName?: string;
+  recipientAccountNumber?: string;
+  recipientBankCode?: string;
+  recipientBankName?: string;
+}
+
+export interface ClaimDocument {
+  id: number;
+  claimId: number;
+  userId: number;
+  documentS3Key: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface GetClaimDocumentsResponse extends BaseResponse {
+  data: ClaimDocument[];
+}
+
+export interface GetClaimDocumentResponse extends BaseResponse {
+  data: string;
 }
 
 export interface GetClaimResponse extends BaseResponse {
@@ -174,6 +203,7 @@ export interface ApiSubscription {
   subscriptionCreatedAt?: string;
   subscriptionUpdatedAt?: string;
   subscriptionExtraData?: string;
+  subscriptionPremiums?: string;
   subscriptionToBeRenewed: boolean;
   nextPaymentDate?: string;
   daysBetweenPayments?: number;
@@ -303,6 +333,15 @@ export interface TravelDetailsResponse extends BaseResponse {
 }
 
 // ============================================================
+// Admin Notifications
+// ============================================================
+export interface NotifyRequest {
+  subject: string;
+  message: string;
+  userId?: string;
+}
+
+// ============================================================
 // Admin Shared
 // ============================================================
 export interface AdminListParams {
@@ -349,4 +388,52 @@ export interface GetUsersResponse extends BaseResponse {
 
 export interface GetUserResponse extends BaseResponse {
   data: ApiUser;
+}
+
+// Complaints (Admin)
+export interface ApiComplaint {
+  complaintId: number;
+  complaintCode?: string;
+  complaintDescription?: string;
+  complaintStatus?: string;
+  complaintUserId?: number;
+  complaintCreatedAt?: string;
+  complaintUpdatedAt?: string;
+}
+
+export interface GetComplaintsResponse extends BaseResponse {
+  data: ApiComplaint[];
+  totalSize: number;
+  openCount: number;
+  resolvedCount: number;
+  rejectedCount: number;
+}
+
+export interface GetComplaintResponse extends BaseResponse {
+  data: ApiComplaint;
+}
+
+export interface ComplaintToggleRequest {
+  action: 'RESOLVED' | 'REJECTED';
+}
+
+// ============================================================
+// Policy Documents (Admin)
+// ============================================================
+export interface PolicyDocumentSummary {
+  policyDocumentId: number;
+  policyDocumentUserId?: number;
+  policyDocumentPolicyId?: number;
+  policyDocumentSubscriptionId?: number;
+  policyDocumentStatus?: string;
+  policyDocumentCreatedAt?: string;
+  policyDocumentUpdatedAt?: string;
+}
+
+export interface GetPolicyDocumentsResponse extends BaseResponse {
+  data: PolicyDocumentSummary[];
+}
+
+export interface GetPolicyDocumentUrlResponse extends BaseResponse {
+  data: string;
 }
