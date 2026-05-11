@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  FileSearch, MessageSquare, FileText,
-  ArrowRight, ShieldAlert, Download, BrainCircuit, Send,
+  FileSearch, FileText,
+  ArrowRight, ShieldAlert, Download, BrainCircuit,
   FileImage, Calendar, X, Eye, ChevronLeft, Loader2, RefreshCw
 } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
@@ -11,13 +11,6 @@ import { claimServiceApi } from '@/service/api/ClaimServiceApi';
 import { paymentServiceApi } from '@/service/api/PaymentServiceApi';
 import { ApiClaim } from '@/types/api';
 import { toast } from 'sonner';
-
-const mockMessages = [
-  { id: 1, sender: 'Customer', text: 'I have submitted all required documents for my claim.', time: '09:30 AM', isAdmin: false },
-  { id: 2, sender: 'Admin', text: 'Received. We are reviewing your documents now.', time: '02:22 PM', isAdmin: true },
-  { id: 3, sender: 'Customer', text: 'How long will the review process take?', time: '10:15 AM', isAdmin: false },
-  { id: 4, sender: 'Admin', text: "Standard review is 5-7 business days. We'll keep you updated.", time: '11:45 AM', isAdmin: true },
-];
 
 const Claims: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -48,16 +41,11 @@ const Claims: React.FC = () => {
   const banks = banksData?.data ?? [];
 
   // Modal view states
-  const [modalView, setModalView] = useState<'details' | 'messages'>('details');
   const [claimAction, setClaimAction] = useState<'reject' | 'settle' | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [settleAccountName, setSettleAccountName] = useState('');
   const [settleAccountNumber, setSettleAccountNumber] = useState('');
   const [settleBankCode, setSettleBankCode] = useState('');
-
-  // Messaging
-  const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState(mockMessages);
 
   // Report modal
   const [showReport, setShowReport] = useState(false);
@@ -107,7 +95,6 @@ const Claims: React.FC = () => {
     setSelectedClaim(claim);
     setAiAnalysis('');
     setClaimAction(null);
-    setModalView('details');
   };
 
   const handleAcceptClaim = async () => {
@@ -174,19 +161,6 @@ const Claims: React.FC = () => {
     } catch {
       toast.error('Failed to load document');
     }
-  };
-
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    setMessages(prev => [...prev, {
-      id: prev.length + 1,
-      sender: 'Admin',
-      text: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isAdmin: true,
-    }]);
-    setNewMessage('');
-    toast.success('Message sent to customer');
   };
 
   return (
@@ -480,8 +454,7 @@ const Claims: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Left Column */}
               <div className="space-y-8">
-                {modalView === 'details' ? (
-                  <>
+                <>
                     {/* Case Details */}
                     <div>
                       <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px] mb-4">Case Details</h4>
@@ -548,73 +521,16 @@ const Claims: React.FC = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => setModalView('messages')}
-                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        Secure Message
-                      </button>
+                    <div>
                       <button
                         onClick={() => toast.info('Internal audit trail initiated')}
-                        className="flex-1 flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
+                        className="w-full flex items-center justify-center gap-2 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all text-sm"
                       >
                         <FileSearch className="w-4 h-4" />
                         Internal Audit
                       </button>
                     </div>
-                  </>
-                ) : (
-                  /* Messages View */
-                  <>
-                    <div className="flex items-center gap-3 mb-2">
-                      <button
-                        onClick={() => setModalView('details')}
-                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[3px]">Secure Communication</h4>
-                    </div>
-                    <div className="bg-slate-50 rounded-[28px] border border-slate-100 flex flex-col h-[420px]">
-                      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                        {messages.map(msg => (
-                          <div key={msg.id} className={`flex ${msg.isAdmin ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] p-3 rounded-2xl ${
-                              msg.isAdmin
-                                ? 'bg-[#0D0D12] text-white rounded-br-lg'
-                                : 'bg-white border border-slate-200 text-slate-800 rounded-bl-lg'
-                            }`}>
-                              <p className="text-sm font-medium">{msg.text}</p>
-                              <p className={`text-[10px] mt-1 ${msg.isAdmin ? 'text-white/50' : 'text-slate-400'}`}>
-                                {msg.sender} · {msg.time}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="p-3 border-t border-slate-200">
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={newMessage}
-                            onChange={e => setNewMessage(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                            placeholder="Type a message..."
-                            className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
-                          />
-                          <button
-                            onClick={handleSendMessage}
-                            className="p-2.5 bg-[#0D0D12] text-white rounded-xl hover:bg-black transition-colors"
-                          >
-                            <Send className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
+                </>
               </div>
 
               {/* Right Column - AI + Actions */}

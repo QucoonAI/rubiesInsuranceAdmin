@@ -832,6 +832,96 @@
         }
       }
     },
+    "/api/{stage}/admin/policy-documents": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getPolicyDocuments",
+        "operationId": "getPolicyDocumentsUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetPolicyDocumentsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{stage}/admin/policy-documents/{policyDocumentId}": {
+      "get": {
+        "tags": ["admin-controller"],
+        "summary": "getPolicyDocumentUrl",
+        "operationId": "getPolicyDocumentUrlUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "policyDocumentId",
+            "in": "path",
+            "description": "policyDocumentId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetPolicyDocumentUrlResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/{stage}/admin/subscriptions": {
       "get": {
         "tags": ["admin-controller"],
@@ -2212,6 +2302,47 @@
         }
       }
     },
+    "/api/{stage}/subscriptions/pending": {
+      "get": {
+        "tags": ["subscription-controller"],
+        "summary": "readPending",
+        "operationId": "readPendingUsingGET",
+        "produces": ["*/*"],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stage",
+            "in": "path",
+            "description": "stage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/SubscriptionReadListResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/{stage}/subscriptions/{id}/cancel": {
       "delete": {
         "tags": ["subscription-controller"],
@@ -2689,6 +2820,9 @@
         "claimNarration": {
           "type": "string"
         },
+        "claimNumber": {
+          "type": "string"
+        },
         "claimPremium": {
           "type": "string"
         },
@@ -3135,6 +3269,41 @@
       },
       "title": "GetComplaintsResponse"
     },
+    "GetPolicyDocumentUrlResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "string"
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetPolicyDocumentUrlResponse"
+    },
+    "GetPolicyDocumentsResponse": {
+      "type": "object",
+      "required": ["data", "responseCode", "responseMessage"],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PolicyDocumentSummary"
+          }
+        },
+        "responseCode": {
+          "type": "string"
+        },
+        "responseMessage": {
+          "type": "string"
+        }
+      },
+      "title": "GetPolicyDocumentsResponse"
+    },
     "GetSubscriptionResponse": {
       "type": "object",
       "required": ["data", "responseCode", "responseMessage"],
@@ -3430,6 +3599,37 @@
       },
       "title": "PaymentAccountResponse"
     },
+    "PolicyDocumentSummary": {
+      "type": "object",
+      "properties": {
+        "policyDocumentCreatedAt": {
+          "type": "string"
+        },
+        "policyDocumentId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "policyDocumentPolicyId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "policyDocumentStatus": {
+          "type": "string"
+        },
+        "policyDocumentSubscriptionId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "policyDocumentUpdatedAt": {
+          "type": "string"
+        },
+        "policyDocumentUserId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "PolicyDocumentSummary"
+    },
     "Subscription": {
       "type": "object",
       "required": ["subscriptionToBeRenewed"],
@@ -3442,6 +3642,9 @@
           "type": "string"
         },
         "s3Url": {
+          "type": "string"
+        },
+        "subscriptionAccountNumber": {
           "type": "string"
         },
         "subscriptionAssuredSum": {
@@ -3472,6 +3675,9 @@
         "subscriptionPaymentAmount": {
           "type": "number"
         },
+        "subscriptionPolicyCode": {
+          "type": "string"
+        },
         "subscriptionPolicyId": {
           "type": "integer",
           "format": "int32"
@@ -3480,6 +3686,9 @@
           "type": "string"
         },
         "subscriptionPremiums": {
+          "type": "string"
+        },
+        "subscriptionReference": {
           "type": "string"
         },
         "subscriptionStatus": {

@@ -7,7 +7,8 @@ import {
   MessageSquareWarning,
   LayoutDashboard,
   Settings as SettingsIcon,
-  LogOut
+  LogOut,
+  FileCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -21,6 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLogout }) 
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'subscriptions', label: 'Subscriptions', icon: FileText },
+    { id: 'policy-documents', label: 'Policy Documents', icon: FileCheck },
     { id: 'claims', label: 'Claims', icon: AlertCircle },
     { id: 'complaints', label: 'Complaints', icon: MessageSquareWarning },
   ];

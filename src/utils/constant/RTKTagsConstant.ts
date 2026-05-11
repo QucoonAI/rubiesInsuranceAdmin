@@ -39,4 +39,9 @@ export const RTKTagsConstant = {
         DETAIL: 'ComplaintDetail',
         INDEX: 'Complaint',
     },
+    POLICY_DOCUMENT_TAGS: {
+        LIST: 'PolicyDocumentList',
+        DETAIL: 'PolicyDocumentDetail',
+        INDEX: 'PolicyDocument',
+    },
 };

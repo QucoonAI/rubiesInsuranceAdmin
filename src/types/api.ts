@@ -416,3 +416,24 @@ export interface GetComplaintResponse extends BaseResponse {
 export interface ComplaintToggleRequest {
   action: 'RESOLVED' | 'REJECTED';
 }
+
+// ============================================================
+// Policy Documents (Admin)
+// ============================================================
+export interface PolicyDocumentSummary {
+  policyDocumentId: number;
+  policyDocumentUserId?: number;
+  policyDocumentPolicyId?: number;
+  policyDocumentSubscriptionId?: number;
+  policyDocumentStatus?: string;
+  policyDocumentCreatedAt?: string;
+  policyDocumentUpdatedAt?: string;
+}
+
+export interface GetPolicyDocumentsResponse extends BaseResponse {
+  data: PolicyDocumentSummary[];
+}
+
+export interface GetPolicyDocumentUrlResponse extends BaseResponse {
+  data: string;
+}
