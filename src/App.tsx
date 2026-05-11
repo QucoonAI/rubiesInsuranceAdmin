@@ -5,7 +5,9 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Customers from './components/Customers';
 import Subscriptions from './components/Subscriptions';
+import PolicyDocuments from './components/PolicyDocuments';
 import Claims from './components/Claims';
+import Complaints from './components/Complaints';
 import Settings from './components/Settings';
 import Login from './components/Login';
 import { Search, Bell, X, CheckCheck, Plus, UserPlus, FilePlus, PieChart } from 'lucide-react';
@@ -46,7 +48,9 @@ const App: React.FC = () => {
       case 'dashboard': return <Dashboard />;
       case 'customers': return <Customers />;
       case 'subscriptions': return <Subscriptions />;
+      case 'policy-documents': return <PolicyDocuments />;
       case 'claims': return <Claims />;
+      case 'complaints': return <Complaints />;
       case 'settings': return <Settings />;
       default: return <Dashboard />;
     }

@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef } from 'react';
-import { Download, Eye, FileCheck, PieChart, X, Send, Mail, Calendar, RefreshCw } from 'lucide-react';
+import { Download, Eye, FileCheck, PieChart, X, Calendar, RefreshCw } from 'lucide-react';
 import { exportToCSV } from '../utils/csvExport';
 import { subscriptionServiceApi } from '@/service/api/SubscriptionServiceApi';
 import { ApiSubscription } from '@/types/api';
@@ -24,10 +24,6 @@ const Subscriptions: React.FC = () => {
   const [reportDateFrom, setReportDateFrom] = useState('');
   const [reportDateTo, setReportDateTo] = useState('');
   const [reportStatus, setReportStatus] = useState('all');
-
-  // Email modal
-  const [showEmail, setShowEmail] = useState(false);
-  const [emailAddress, setEmailAddress] = useState('');
 
   const filteredSubs = useMemo(() => {
     return subscriptions.filter(s => {
@@ -80,16 +76,6 @@ const Subscriptions: React.FC = () => {
       }
     }
     toast.success('Certificate PDF generated');
-  };
-
-  const handleSendEmail = () => {
-    if (!emailAddress.trim()) {
-      toast.error('Please enter an email address');
-      return;
-    }
-    toast.success(`Certificate sent to ${emailAddress}`);
-    setShowEmail(false);
-    setEmailAddress('');
   };
 
   return (
@@ -407,68 +393,11 @@ const Subscriptions: React.FC = () => {
 
             <div className="p-8 bg-slate-50 flex justify-end gap-3">
               <button
-                onClick={() => { setShowEmail(true); }}
-                className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-100 transition-all text-sm flex items-center gap-2"
-              >
-                <Mail className="w-4 h-4" />
-                Distribute via Email
-              </button>
-              <button
                 onClick={handleDownloadPDF}
                 className="px-6 py-3 bg-[#0D0D12] text-white rounded-2xl font-bold hover:bg-black flex items-center gap-2 shadow-xl shadow-slate-200 transition-all text-sm"
               >
                 <Download className="w-4 h-4" />
                 Download PDF
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Email Distribution Modal */}
-      {showEmail && (
-        <div className="fixed inset-0 bg-[#0D0D12]/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[40px] w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-            <div className="p-8 border-b border-slate-100 flex justify-between items-center">
-              <div>
-                <h3 className="text-xl font-black text-[#0D0D12] tracking-tighter">Distribute Certificate</h3>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">SUB-{viewingCert?.subscriptionId}</p>
-              </div>
-              <button onClick={() => setShowEmail(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-8 space-y-5">
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <p className="text-sm font-bold text-[#0D0D12]">{viewingCert?.subscriptionPolicyName}</p>
-                <p className="text-[10px] text-slate-400 font-medium">Certificate will be sent as PDF attachment</p>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Recipient Email *</label>
-                <input
-                  type="email"
-                  value={emailAddress}
-                  onChange={e => setEmailAddress(e.target.value)}
-                  placeholder="customer@email.com"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#0D0D12] focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-slate-100 flex justify-end gap-3">
-              <button
-                onClick={() => setShowEmail(false)}
-                className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-all text-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSendEmail}
-                className="px-6 py-3 bg-[#0D0D12] text-white rounded-2xl font-bold hover:bg-black shadow-lg shadow-slate-200 transition-all text-sm flex items-center gap-2"
-              >
-                <Send className="w-4 h-4" />
-                Send
               </button>
             </div>
           </div>

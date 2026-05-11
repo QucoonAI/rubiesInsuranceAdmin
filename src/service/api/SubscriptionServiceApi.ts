@@ -1,6 +1,6 @@
 import { createApiProxy, createBaseApi } from "@/service/api/BaseServiceApi";
 import { RTKTagsConstant } from "@/utils/constant/RTKTagsConstant";
-import { GetSubscriptionsResponse, GetSubscriptionResponse, VirtualAccountGenerationResponse, AdminListParams } from "@/types/api";
+import { GetSubscriptionsResponse, GetSubscriptionResponse, AdminListParams } from "@/types/api";
 
 const subscriptionTag = Object.values(RTKTagsConstant.SUBSCRIPTION_TAGS);
 
@@ -31,9 +31,9 @@ const api = createBaseApi("api/subscription-service", subscriptionTag).injectEnd
             }),
             providesTags: [RTKTagsConstant.SUBSCRIPTION_TAGS.DETAIL],
         }),
-        renewSubscription: build.query<VirtualAccountGenerationResponse, { subscriptionId: number }>({
-            query: (params) => ({
-                url: `subscriptions/${params.subscriptionId}/renew`,
+        actOnSubscriptionCancellation: build.query<GetSubscriptionResponse, number>({
+            query: (subscriptionId) => ({
+                url: `admin/subscriptions/${subscriptionId}/cancellation`,
                 method: "GET",
             }),
             providesTags: [RTKTagsConstant.SUBSCRIPTION_TAGS.DETAIL],

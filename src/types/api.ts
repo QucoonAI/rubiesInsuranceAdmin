@@ -389,3 +389,51 @@ export interface GetUsersResponse extends BaseResponse {
 export interface GetUserResponse extends BaseResponse {
   data: ApiUser;
 }
+
+// Complaints (Admin)
+export interface ApiComplaint {
+  complaintId: number;
+  complaintCode?: string;
+  complaintDescription?: string;
+  complaintStatus?: string;
+  complaintUserId?: number;
+  complaintCreatedAt?: string;
+  complaintUpdatedAt?: string;
+}
+
+export interface GetComplaintsResponse extends BaseResponse {
+  data: ApiComplaint[];
+  totalSize: number;
+  openCount: number;
+  resolvedCount: number;
+  rejectedCount: number;
+}
+
+export interface GetComplaintResponse extends BaseResponse {
+  data: ApiComplaint;
+}
+
+export interface ComplaintToggleRequest {
+  action: 'RESOLVED' | 'REJECTED';
+}
+
+// ============================================================
+// Policy Documents (Admin)
+// ============================================================
+export interface PolicyDocumentSummary {
+  policyDocumentId: number;
+  policyDocumentUserId?: number;
+  policyDocumentPolicyId?: number;
+  policyDocumentSubscriptionId?: number;
+  policyDocumentStatus?: string;
+  policyDocumentCreatedAt?: string;
+  policyDocumentUpdatedAt?: string;
+}
+
+export interface GetPolicyDocumentsResponse extends BaseResponse {
+  data: PolicyDocumentSummary[];
+}
+
+export interface GetPolicyDocumentUrlResponse extends BaseResponse {
+  data: string;
+}
