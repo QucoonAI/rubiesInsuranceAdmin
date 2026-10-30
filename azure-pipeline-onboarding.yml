@@ -1,0 +1,72 @@
+# azure-pipeline-onboarding.yml
+trigger: none
+
+parameters:
+  - name: repoName
+    type: string
+    displayName: 'New repository name $(Build.Repository.Name)'
+    default: $(Build.Repository.Name)
+  - name: repoDescription
+    type: string
+    default: 'Mirror for $(Build.Repository.Name)'
+    displayName: 'Repository description (optional)'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: GitHubMirrorKey
+  - name: orgName
+    value: 'QucoonAI'
+
+steps:
+  - script: |
+      set -e
+      echo "Creating GitHub repository ${REPO_NAME} in org ${ORG_NAME}..."
+
+      # Default description if none provided
+      DESC="${REPO_DESC:-Mirror for ${REPO_NAME}}"
+
+      HTTP_CODE=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+        -X POST \
+        -H "Authorization: token $GITHUB_ADMIN_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/orgs/${ORG_NAME}/repos" \
+        -d "{\"name\":\"${REPO_NAME}\", \"private\":false, \"description\":\"${DESC}\", \"auto_init\":true}")
+
+      echo "HTTP Status: $HTTP_CODE"
+      cat /tmp/response.json
+      echo ""
+
+      if [ "$HTTP_CODE" -eq 201 ]; then
+        echo "Repository created successfully."
+      elif [ "$HTTP_CODE" -eq 422 ]; then
+        echo "Repository may already exist. Continuing..."
+      else
+        echo "ERROR: GitHub repo creation failed with HTTP $HTTP_CODE"
+        exit 1
+      fi
+
+      echo ""
+      echo "================================================"
+      echo "  ONBOARDING - GITHUB REPO CREATED"
+      echo "================================================"
+      echo "  Repository: https://github.com/${ORG_NAME}/${REPO_NAME}"
+      echo ""
+      echo "  NEXT STEPS (manual):"
+      echo "  1. Set up the Amplify app in AWS Console:"
+      echo "     https://us-east-1.console.aws.amazon.com/amplify/"
+      echo "     Connect this GitHub repo, register the initial branch,"
+      echo "     configure build settings and environment variables."
+      echo ""
+      echo "  2. Clone the new Azure DevOps repo and add"
+      echo "     azure-pipeline-autodeploy.yml at the repo root."
+      echo ""
+      echo "  3. Commit and push to the initial branch."
+      echo "================================================"
+    displayName: 'Create GitHub Repository'
+    env:
+      GITHUB_ADMIN_TOKEN: $(GITHUB_ADMIN_TOKEN)
+      ORG_NAME: $(orgName)
+      REPO_NAME: ${{ parameters.repoName }}
+      REPO_DESC: ${{ parameters.repoDescription }}
