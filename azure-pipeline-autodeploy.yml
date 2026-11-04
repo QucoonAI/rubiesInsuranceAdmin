@@ -1,6 +1,6 @@
 # azure-pipelines.yml
 trigger:
-- dev
+- rubiesInsuranceAdminProd
 
 pool:
   vmImage: 'ubuntu-latest'
